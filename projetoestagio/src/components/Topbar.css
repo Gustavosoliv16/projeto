@@ -1,0 +1,30 @@
+.topbar {
+  width: 100%;
+  background: #2f3640;
+  color: #ffffff;
+ padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+align-self: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+}
+.topbar h1 {
+  margin:15px;
+  font-size: 2rem
+  ;
+}
+.topbar nav a {
+  color: #ffffff;
+  margin-left: 40px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.topbar nav a:hover {
+  color: #00a8ff;
+}
