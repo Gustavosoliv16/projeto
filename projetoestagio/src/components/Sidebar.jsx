@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
-import './sidebar.css';
+import React, { useState } from "react";
+import "./sidebar.css";
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <button className="hamburger" onClick={() => setOpen(!open)}>
+      <button
+        className="menubotao"
+        onClick={() => setOpen(!open)}
+
+      >
         &#9776;
       </button>
-      <div className={`sidebar${open ? ' open' : ''}`}>
+      <div className={`sidebar${open ? " open" : ""}`}>
         <ul>
           <li>Opcao 1</li>
           <li>Opcao 2</li>

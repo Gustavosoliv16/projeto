@@ -1,18 +1,18 @@
-import './content.css';
+import "./content.css";
 
 const Content = () => (
   <main className="main-content">
-    <h2>Welcome to the Landing Page!</h2>
-    <p>This is a modern landing page with a hover sidebar and a top bar.</p>
-<div id='contentbox'>
+    <h2>Bem-vindo ao site de assitencia</h2>
+    <p>pesquisar produto</p>
+    <div id="contentbox">
+      <table>
+        <th id="title">Peças recentes</th>
 
-oaa
-
-</div>
-
-
-
-
+        <th id="title">modelo</th>
+        <tr>peça 1 - monitor</tr>
+        <td>asus 144hz</td>
+      </table>
+    </div>
   </main>
 );
 

@@ -3,9 +3,9 @@
   top: 64px;
   left: 0;
   width: 60px;
-  height: calc(100vh - 64px);
+  height: 90px;
   background: #353b48;
-  color: #ffffff;
+  color: #fa0202;
   transition: width 0.3s;
   overflow: hidden;
   z-index: 10;
@@ -21,25 +21,27 @@
   white-space: nowrap;
   transition: background 0.2s;
 }
-.hamburger {
+.menubotao {
   position: fixed;
-  top: 80px;
-  left: 20px;
+  top: px;
+  left: -8px;
   z-index: 20;
   background: none;
   border: none;
   font-size: 2rem;
-  color: #fff;
+  color: #000000;
   cursor: pointer;
+  top: 170px;
+  left: 10px;
 }
 
-.hamburger:hover {
+.menubotao:hover {
   transition: ease-in 0.7s;
   color: #12d0ff;
 
 }
 
-.hamburger:focus {
+.menubotao:focus {
   outline: none;
 
 }
