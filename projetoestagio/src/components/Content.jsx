@@ -10,7 +10,7 @@ const Content = () => (
 
         <th id="title">modelo</th>
         <tr>peça 1 - monitor</tr>
-        <td>asus 144hz</td>
+        <td >asus 144hz</td>
       </table>
     </div>
   </main>
