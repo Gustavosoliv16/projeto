@@ -6,11 +6,18 @@ const Content = () => (
     <p>pesquisar produto</p>
     <div id="contentbox">
       <table>
-        <th id="title">Peças recentes</th>
-
-        <th id="title">modelo</th>
-        <tr>peça 1 - monitor</tr>
-        <td >asus 144hz</td>
+        <thead>
+          <tr>
+            <th id="title">Peças recentes</th>
+            <th>Modelo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>peça 1 - monitor</td>
+            <td>asus 144hz</td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </main>

@@ -1,0 +1,38 @@
+
+.dashboard-container {
+  position: fixed;
+  margin-top: 80px;
+  right: 40px; 
+  z-index: 15;
+  background: #f4f6fa;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(53, 59, 72, 0.08);
+  max-width: 350px;
+  text-align: center;
+  font-family: 'Montserrat', Arial, sans-serif;
+  padding: 32px 24px;
+}
+
+.dashboard-container span {
+  
+  display: block;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  color: #353b48;
+}
+
+.dashboard-container button {
+  background: #12d0ff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 24px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 0px;
+}
+
+.dashboard-container button:hover {
+  background: #05bfee;
+}

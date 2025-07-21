@@ -3,12 +3,12 @@
   background: #2f3640;
   color: #ffffff;
  padding: 5px;
-  display: flex;
+  display:flex;
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 align-self: center;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 20;
