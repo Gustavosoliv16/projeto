@@ -2,13 +2,12 @@
   width: 100%;
   background: #2f3640;
   color: #ffffff;
- padding: 5px;
   display:flex;
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 align-self: center;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   z-index: 20;
@@ -18,7 +17,9 @@ align-self: center;
   font-size: 2rem
   ;
 }
-.topbar nav a {
+.topbar nav a 
+{
+  padding: 10px;
   color: #ffffff;
   margin-left: 40px;
   text-decoration: none;
@@ -27,4 +28,9 @@ align-self: center;
 }
 .topbar nav a:hover {
   color: #00a8ff;
+}
+
+#logo-img{
+  width: 90px;
+  height: auto;
 }

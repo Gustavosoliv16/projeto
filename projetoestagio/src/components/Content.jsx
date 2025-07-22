@@ -1,4 +1,4 @@
-import "./content.css";
+import "../styles/Content.css";
 
 const Content = () => (
   <main className="main-content">

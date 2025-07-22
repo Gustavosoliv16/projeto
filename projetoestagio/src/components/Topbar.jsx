@@ -1,9 +1,9 @@
-import "./topbar.css";
+import "../styles/Topbar.css";
 
 const Topbar = () => (
   <div className="topbar">
     <h1 id="logo">
-      <img src="./public/logoctga.png" alt="" />
+      <img id="logo-img" src="./public/Brasao_Caratinga.png" alt="" />
     </h1>
     <nav>
       <a href="#home">Home</a>
