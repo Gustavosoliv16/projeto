@@ -2,8 +2,10 @@ import "../styles/Content.css";
 
 const Content = () => (
   <main className="main-content">
-    <h2>Bem-vindo ao site de assitencia</h2>
-    <p>pesquisar produto</p>
+   <div className="search-container"> 
+    <input id="inputsearch" type="text" placeholder="pesquisar"/>
+    <button id="search-button" type="submit">Pesquisar</button>
+</div>
     <div id="contentbox">
       <table>
         <thead>
