@@ -1,9 +1,9 @@
-const express = import("express");
-const cors = import("cors");
-const db = import("./dbs.js");
+import express from "express";
+import cors from "cors";
+import db from "./dbs.js";
 
 const app = express();
-const PORT = 3050;
+const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -22,5 +22,6 @@ app.get("/api/usuarios", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Backend rodando em 198.162.3.20:${PORT}`);
+  console.log(`✅ Backend rodando em localhost:${PORT}`);
 });
+

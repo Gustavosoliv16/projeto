@@ -1,18 +1,30 @@
 const firebird = import("firebird");
 
-const db = firebird.pool(5, options);
-export default db;
 
-const options = {
+/*const options = {
   host: "192.168.3.20",
   port: 3050,
-  database: "192.168.3.20/home/informatica/PMC/BD/OS_INFORMATICA.FDB",
+  database: "192.168.3.20:/home/informatica/PMC/BD/OS_INFORMATICA.FDB",
   user: "SYSDBA",
   password: "infor@pref#23",
   lowercase_keys: false,
   role: null,
   pageSize: 4096,
-};
+};*/
+
+const options = {
+  host: "localhost",
+  port: 3050,
+  database: "C:/bancotestelocal/BANCOLOCALTESTE.FDB",
+  user: "ADMYNSYS",
+  password: "pref@23",
+  lowercase_keys: false,
+  role: null,
+  pageSize: 4096,
+}
+
+const db = firebird.pool(5, options);
+export default db;
 
 firebird.attach(options, (err, db) => {
   if (err) {
