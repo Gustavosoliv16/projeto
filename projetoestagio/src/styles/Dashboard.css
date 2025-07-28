@@ -1,47 +1,28 @@
-
-#dashcontainer {
-  height: 200px;
-  width: 200px;
-  position: fixed;
-  margin-top: 160px;
-  right: 40px; 
-  z-index: 15;
-  color: #05bfee;
-  background: #0458ff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(53, 59, 72, 0.08);
-  max-width: 350px;
-  text-align: center;
-  font-family: 'Montserrat', Arial, sans-serif;
-  padding: 32px 24px;
+.dashcontainer {
+  position: relative;
+  padding-top: 10px;
+  background-color: #000000;
+color: chartreuse;
 }
 
-#dashcontainer span {
-  height: 200px;
-  width: 200px;
-  background-color: blueviolet;
-  display: block;
-  margin-bottom: 12px;
-  font-size: 1.1rem;
-  color: #353b48;
+#botaosair {
+  position: relative;
+  right: 20px;
+  z-index: 100;
 }
 
-#dashcontainer button {
-  height: 200px;
-  width: 200px;
-  background: #12d0ff;
-  color: #fff;
+#botaosair button {
+z-index: 100;
+  padding: 10px 16px;
+  background: #000000;
+  color: white;
   border: none;
   border-radius: 6px;
-  padding: 10px 24px;
-  font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 0px;
+  transition: background 0.3s ease;
 }
 
-#dashcontainer button:hover {
-  height: 200px;
-  width: 200px;
+#botaosair button:hover {
   background: #05bfee;
 }

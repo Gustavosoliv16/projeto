@@ -39,9 +39,9 @@ export default function Login() {
     <form id="login-form" onSubmit={handleSubmit}>
 
       <img id="imglogin" src="./public/Brasao_caratinga.png" alt="brasaoctga" />
-     <div class="prefeitura-texto">
-  <span class="linha-superior">Prefeitura</span>
-  <span class="linha-inferior">De Caratinga</span>
+     <div className="prefeitura-texto">
+  <span className="linha-superior">Prefeitura</span>
+  <span className="linha-inferior">De Caratinga</span>
 </div>
       {error && <p style={{ color: "red" }}>{error}</p>}
       

@@ -10,13 +10,13 @@ export default function Dashboard() {
 
   return (
    
-         <div id="dashcontainer">  
-         
+      <div>
+          <Topbar />
+          <div id="botaosair">
+         <button onClick={logout}>Sair ({authUser.email})</button>
+      </div>
       <Sidebar />
       <Content  />
-      <Topbar />
-      
-      <button onClick={logout}>Sair ({authUser.email})</button>
-    </div>
+      </div>
   );
 }
