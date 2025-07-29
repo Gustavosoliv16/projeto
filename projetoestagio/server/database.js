@@ -1,9 +1,7 @@
-// dbs.js
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const firebird = require("node-firebird");
 
-// Configurações de Rede
 const options = {
   host: "192.168.3.20", 
   port: 3050,
