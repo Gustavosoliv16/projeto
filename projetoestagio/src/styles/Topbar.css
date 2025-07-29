@@ -1,7 +1,6 @@
 .topbar {
   width: 100%;
   background: #12d0ff;
-  
   color: #ffffff;
   display:flex;
   align-items: center;
@@ -20,9 +19,10 @@ align-self: center;
 }
 .topbar nav a 
 {
-  padding: 10px;
+  padding: 1px;
   color: #ffffff;
   margin-left: 40px;
+  margin-right: 10px;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;
@@ -34,4 +34,34 @@ align-self: center;
 #logo-img{
   width: 90px;
   height: auto;
+}
+
+#botaosair {
+  position: relative;
+  display: flex;
+  justify-content: center ;
+  width: 100%;
+  z-index: 100;
+  padding: 3px;
+  margin: 5px;
+  top: 30px;
+  background-color: chartreuse
+  ;
+}
+
+#botaoum {
+ text-align: left;
+background-color: blue;
+  width: auto;
+  padding: 10px;
+  margin-right: 10px;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#botaosair button:hover {
+  color: #dadada;
 }
