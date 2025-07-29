@@ -24,7 +24,6 @@ app.post("/cadastro", (req, res) => {
 
       if (err2) return res.status(500).json({ error: err2.message });
 
-      // Firebird não retorna insertId, então retornamos os dados enviados
       return res.status(201).json({
         message: "Usuário cadastrado com sucesso",
         usuario: { NOME_USUARIO, DEPARTAMENTO, CPF, EMAIL, TIPO_USUARIO, SENHA }
