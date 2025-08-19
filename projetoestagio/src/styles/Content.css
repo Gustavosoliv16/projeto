@@ -12,6 +12,7 @@
   background: #f5f6fa;
   min-height: calc(100vh - 64px);
   box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
 #contentbox {
@@ -23,6 +24,7 @@
   margin-top: 2rem;
   color: #222;
   font-size: 1.1rem;
+
   width: 80dvh;
   max-width: 900px;
   min-height: 200px;
@@ -49,6 +51,7 @@
   border-radius: 6px;
   padding: 10px 24px;
   font-size: 1rem;
+  font-family: 'Poppins', Tahoma, sans-serif;
   cursor: pointer;
   transition: background 0.2s;
   margin-top: 10px;

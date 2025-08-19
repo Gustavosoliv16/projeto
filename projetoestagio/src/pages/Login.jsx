@@ -1,42 +1,37 @@
-// src/pages/Login.jsx
-import { useState } from "react";
-import { useAuth } from "../context/Authtab.jsx";
+import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import "../Styles/Login.css";
-
+import axios from "axios";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [EMAIL, setEmail] = useState("");
+  const [SENHA, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const { login } = useAuth();
 
-  // Validação simples
-    if (!email || !email.includes("@")) {
-      setError("Por favor, insira um email válido");
-      return;
-    }
-    
-    if (!password || password.length < 8) { // exemplo: senha com pelo menos 6 caracteres
-      setError("A senha deve ter pelo menos 6 caracteres");
-      return;
-    }
-    
-    try {
-      login({ email, password });
-      navigate("/dashboard");
-    } catch (err) {
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setError("");
+
+  try {
+    const response = await axios.post("/api/login", { EMAIL, SENHA });
+    const { token } = response.data;
+    login(token);
+    navigate("/telainicial");
+
+  } catch (error) {
+    console.error("Login failed:", error);
+    if (error.response && error.response.data && error.response.status) { setError(error.response.data.error); } else {
+      console.error("Erro desconhecido:", error);
       setError("Credenciais inválidas. Por favor, tente novamente.");
-      console.error("Login failed:", err);
     }
-  };
-
+  }
+}
   return (
-    <form id="login-form" onSubmit={handleSubmit}>
+    <form id="login-form" onSubmit={handleLogin}>
 
       <img id="imglogin" src="./public/Brasao_caratinga.png" alt="brasaoctga" />
      <div className="prefeitura-texto">
@@ -48,14 +43,14 @@ export default function Login() {
       <input id="input-email" className="input"
         type="email"
         placeholder="Email"
-        value={email}
+        value={EMAIL}
         onChange={(e) => setEmail(e.target.value)}
       />
       
       <input id="input-password" className="input"
         type="password"
         placeholder="Senha"
-        value={password}
+        value={SENHA}
         onChange={(e) => setPassword(e.target.value)}
       />
       

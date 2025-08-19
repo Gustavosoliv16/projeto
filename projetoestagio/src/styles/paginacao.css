@@ -1,0 +1,23 @@
+.paginacao
+{
+width: inherit;
+height: inherit;
+position: relative;
+font-size: 15px;
+font-family: 'Poppins', sans-serif;
+text-decoration: none;
+font-weight: bold;
+color: black;
+background-color: none;
+background: none;
+border: none;
+cursor: pointer;
+}
+
+.paginacao:hover{
+transition: ease-in-out 0.5s;
+color: rgb(255, 255, 255);
+position: inherit;
+width: inherit;
+height: inherit;
+}

@@ -1,86 +1,80 @@
-
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.sidebar li {
-  padding: 1.5rem 1rem;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.6s;
-}
+/* Refined styles for the menu button */
 .menubotao {
-  position: fixed;
-  top: px;
-  left: -8px;
-  z-index: 20;
-  background: none;
-  border: none;
-  font-size: 2rem;
-  color: #000000;
-  cursor: pointer;
-  top: 170px;
-  left: 10px;
+    position: fixed;
+    z-index: 20;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #000000;
+    cursor: pointer;
+    visibility: visible;
+    left: 10px; /* Consolidado em uma única regra */
+    padding: 0;
+    top: 17vh;
 }
 
 .menubotao:hover {
-  transition: ease-in 0.7s;
-  color: #12d0ff;
-
+    transition: color 0.7s ease-in-out; 
+    color: #ffffff;
 }
 
 .menubotao:focus {
-  outline: none;
-
+    outline: none;
 }
 
 .sidebar {
-  position: fixed;
-  left: 0px;
-  padding-top: 65px;
-  width: 180px;
-  height: 100vh;
-  background: #12d0ff;
-  color: #fff;
-  transform: translateX(-100%);
-  transition: transform 0.8s ease-in-out, visibility 0.8s ease-in-out, opacity 0.5s;
-  overflow: hidden;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  visibility: hidden;
-  pointer-events: none;
+    position: fixed;
+    display: flex;
+    align-items: center;
+    left: 0;
+    z-index: 10;
+    width: 180px;
+    height: 100vh;
+    background: #12d0ff;
+    color: #fff;
+    flex-direction: column;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(-100%);
+    opacity: 0;
+    transition: transform 0.8s ease-in-out, visibility 0.8s ease-in-out, opacity 0.5s;
+    overflow: hidden;
 }
 
 .sidebar.open {
-  transform: translateX(0);
-  left: 0;
-  padding-top: 65px;
-  width: 180px;
-  transition: transform 0.8s ease-in-out, visibility 0.8s ease-in-out, opacity 0.5s;
-  opacity: 1;
-  pointer-events: auto;
-   visibility: visible;
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
 }
 
 .sidebar ul {
-  position: relative;
-  padding-top: 130px;
-  margin: 10px;
-  align-items: center;
+    width: inherit;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-top: 10rem;
+    padding-top: 1rem;
+    visibility: visible; 
 }
 
-.sidebar li {
-  width: 100%;
-  padding: 1.5rem 0rem;
-  text-align: center;
-  cursor: pointer;
-  border: #353b48;
-}
-
-.sidebar li:hover {
-  transition: ease-in-out 0.7s;
-  color: #05bfee;
+.listarotas {
+    width: 100%;
+    height: 3rem;
+    margin: 1rem;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-self: center;
+    align-items: center;
+    align-content: center;
+    white-space: nowrap;
+    transition: all 0.7s ease-in-out; 
 }

@@ -68,7 +68,7 @@
     font-size: 2rem;
     font-weight: bold;
     align-items: flex-end;
-    margin-top: -6px; /* ajuste fino para aproximar as linhas */
+    margin-top: -6px; 
 }
 
 #imglogin {
