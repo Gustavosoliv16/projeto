@@ -1,6 +1,5 @@
 import { useState } from "react";
 import axios from "axios";
-// O nome do arquivo CSS pode ser o que você criou, ex: "../styles/forms.css"
 import "../styles/Cadpage.css"; 
 
 
@@ -15,11 +14,11 @@ const CadastroUsuario = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Agora os states terão os valores corretos dos inputs
+        
         try {
             const response = await axios.post("/api/cadastro", { NOME_USUARIO, EMAIL, SENHA, CPF, DEPARTAMENTO, TIPO_USUARIO });
             console.log("Usuário cadastrado:", response.data);
-            // Opcional: Limpar os campos após o sucesso
+           
             setNome("");
             setEmail("");
             setSenha("");
@@ -45,7 +44,6 @@ const CadastroUsuario = () => {
     return (
       <main className="forms-container">
 
-        {/* --- CARD DE CADASTRO DE USUÁRIO --- */}
         <div className="form-card">
           <h2 className="form-title">Cadastrar Novo Usuário</h2>
           <form onSubmit={handleSubmit} className="form-grid">
@@ -135,13 +133,13 @@ const CadastroUsuario = () => {
           </form>
         </div>
 
-        {/* --- CARD DE PESQUISA --- */}
+     
         <div className="form-card">
           <h2 className="form-title">Pesquisar Usuários</h2>
           <form onSubmit={handleSearch} className="search-form">
             <input
               id="inputsearch"
-              name="inputsearch" // Adicionar o atributo name ajuda na referência
+              name="inputsearch" 
               type="text"
               placeholder="Pesquisar por nome, email ou CPF..."
               className="form-input search-input"
