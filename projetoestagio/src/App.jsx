@@ -8,7 +8,6 @@ import Content from "./components/Content.jsx";
 import PrivateRoute from "./routes/PrivateRoute.jsx";
 import CadastroUsuario from "./pages/cadastros.jsx";
 import Template from "./components/Maintemplate.jsx";
-import tailwindcss from "@tailwindcss/vite";
 
 
 function App() {
