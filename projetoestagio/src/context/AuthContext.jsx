@@ -1,4 +1,3 @@
-// src/context/AuthContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
@@ -6,6 +5,7 @@ const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
   const [authData, setAuthData] = useState({ token: null, user: null });
+  const [loading, setLoading] = useState(true);
 
   
   const logout = () => {
@@ -32,8 +32,12 @@ export default function AuthProvider({ children }) {
       
         console.error("Token inválido ou malformado. Fazendo logout.", e);
         logout(); 
+
+
+        
       }
     }
+    setLoading(false);
   }, []);
   const login = (token) => {
     const user = jwtDecode(token);
@@ -45,6 +49,7 @@ export default function AuthProvider({ children }) {
     token: authData.token,
     user: authData.user,
     isAuthenticated: !!authData.token,
+    loading,
     login,
     logout
   };

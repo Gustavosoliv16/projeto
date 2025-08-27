@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 app.post("/api/cadastro", async (req, res) => {
-  const { NOME_USUARIO, DEPARTAMENTO, CPF, EMAIL, TIPO_USUARIO, SENHA } = req.body;
+  const { NOME_USUARIO, ID_SETOR, CPF, EMAIL, TIPO_USUARIO, SENHA } = req.body;
 
 const salt = await bcrypt.genSalt(10);
 const senhaHash = await bcrypt.hash(SENHA, salt);
@@ -19,11 +19,11 @@ const senhaHash = await bcrypt.hash(SENHA, salt);
     if (err) return res.status(500).json({ error: err.message });
 
     const sql = `
-      INSERT INTO USUARIOS (NOME_USUARIO, DEPARTAMENTO, CPF, EMAIL, TIPO_USUARIO, SENHA) 
+      INSERT INTO USUARIOS (NOME_USUARIO, ID_SETOR, CPF, EMAIL, TIPO_USUARIO, SENHA) 
       VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    conn.query(sql, [NOME_USUARIO, DEPARTAMENTO, CPF, EMAIL, TIPO_USUARIO,senhaHash], (err2) => {
+    conn.query(sql, [NOME_USUARIO, ID_SETOR, CPF, EMAIL, TIPO_USUARIO,senhaHash], (err2) => {
       conn.detach();
 
       if (err2) return res.status(500).json({ error: err2.message });
@@ -75,6 +75,7 @@ app.post("/api/login", (req, res) => {
                 return res.status(200).json({ message: "login efetuado", token: token });
                 
             } catch (bcryptError) {
+              console.log('erro bcrypt', bcryptError)
                 return res.status(500).json({ error: "Erro ao verificar credencias" })
             }
         }); 
@@ -128,10 +129,10 @@ db.get((err,conn)=>{
 
 app.put("/api/cadastro/:id", async (req, res) => {
  const { id } = req.params;
- const { NOME_USUARIO, DEPARTAMENTO, CPF, EMAIL, TIPO_USUARIO, SENHA } = req.body;
+ const { NOME_USUARIO, ID_SETOR, CPF, EMAIL, TIPO_USUARIO, SENHA } = req.body;
 
 
-  if (!NOME_USUARIO && !DEPARTAMENTO && !CPF && !EMAIL && !TIPO_USUARIO && !SENHA) {
+  if (!NOME_USUARIO && !ID_SETOR && !CPF && !EMAIL && !TIPO_USUARIO && !SENHA) {
     return res.status(400).json({ error: "Nenhum dado fornecido para atualização." });
   }
 
@@ -146,9 +147,9 @@ app.put("/api/cadastro/:id", async (req, res) => {
         camposParaAtualizar.push("NOME_USUARIO = ?");
         valores.push(NOME_USUARIO);
       }
-      if (DEPARTAMENTO) {
-        camposParaAtualizar.push("DEPARTAMENTO = ?");
-        valores.push(DEPARTAMENTO);
+      if (ID_SETOR) {
+        camposParaAtualizar.push("ID_SETOR = ?");
+        valores.push(ID_SETOR);
       }
       if (CPF) {
         camposParaAtualizar.push("CPF = ?");

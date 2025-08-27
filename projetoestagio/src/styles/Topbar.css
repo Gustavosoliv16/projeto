@@ -1,68 +1,78 @@
 .topbar {
   width: 100%;
-  background: #12d0ff;
-  color: #ffffff;
-  display:flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-align-self: center;
   position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 20;
-}
-.topbar h1 {
-  margin:15px;
-  font-size: 2rem
-  ;
-}
-.topbar nav a 
-{
-  padding: 1px;
-  color: #ffffff;
-  margin-left: 40px;
-  margin-right: 10px;
-  text-decoration: none;
-  font-weight: 500;
-  font-family: 'Poppins', sans-serif;
-  transition: color 0.2s;
-}
-.topbar nav a:hover {
-  color: #00a8ff;
-}
-
-#logo-img{
-  width: 90px;
-  height: auto;
-}
-
-#botaosair {
-  margin: 3px;
-  position: relative;
-  left: 50px;
   display: flex;
-  justify-content: center ;
-  width: 87px;
-  z-index: 100px;
-  border-radius: 5px;
-  top: 30px;
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 1rem 2rem; 
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 70px;
+  box-sizing: border-box;
+  box-shadow: inset  0 0 5px rgba(0, 0, 0, 0.2);
 }
 
-#botaoum {
- text-align: auto;
- font-family:'Poppins';
-background-color: rgb(255, 255, 255);
-  width: 100%;
-  height: 100%;
-  padding: 5px;
-  color: rgb(0, 0, 0);
-  border: none;
-  border-radius: 6px;
-  font-size: 15px;
-  cursor: pointer;
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px; 
+  text-decoration: none; 
+  color: #333;
 }
 
-#botaosair button:hover {
+.topbar-logo img {
+  height: 45px; 
+  width: auto;
+}
+
+.topbar-logo span {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px; 
+}
+
+.user-name {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
   color: #000000;
+}
+
+.logout-button, .login-button {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-decoration: none; 
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.logout-button:hover, .login-button:hover {
+  background-color: #0056b3; 
+}
+
+
+@media (max-width: 600px) {
+  .topbar {
+    padding: 0.8rem 1rem;
+  }
+
+  .topbar-logo span {
+    display: none;
+  }
+  
+  .user-name::before {
+    content: ""; 
+  }
 }

@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import "./App.css";
 
 
 import Login from "./pages/Login.jsx";
@@ -9,20 +8,19 @@ import PrivateRoute from "./routes/PrivateRoute.jsx";
 import CadastroUsuario from "./pages/cadastros.jsx";
 import Template from "./components/Maintemplate.jsx";
 
+import GerenciarOrdensServico from "./pages/Ordemservico.jsx";
+import GerenciarSetores from "./pages/GerenciarSetores.jsx";
+import GerenciarEquipamentos from "./pages/GerenciarEquipamentos.jsx";
+
 
 function App() {
   return (
       <Routes>
-        {/* Rota pública de Login */}
         <Route path="/login" element={<Login />} />
-
-        {/* ROTA PAI (LAYOUT
-          - Todas as rotas DENTRO dela serão renderizadas no <Outlet /> do seu Template.
-        */}
 
         <Route 
           path="/" 
-          element={
+          element={ 
             <PrivateRoute>
               <Template />
             </PrivateRoute>
@@ -31,12 +29,14 @@ function App() {
           {/* ROTAS FILHAS (PÁGINAS) */}
           {/* O path aqui é relativo ao pai. Como o pai é "/", o path final será "/telainicial" */}
           <Route path="telainicial" element={<Content />} />
-        
           <Route path="usuarios-cadastro" element={<CadastroUsuario />} />
-          {/* Para adicionar novas páginas, basta criar uma nova rota filha aqui */}
+
+          <Route path="ordens-servico" element={<GerenciarOrdensServico />} />
+          <Route path="setores" element={<GerenciarSetores />} />
+          <Route path="equipamentos" element={<GerenciarEquipamentos />} />
         </Route>
 
-        <Route path="*" element={<Login />} />
+       <Route path="*" element={<Login />} />
         
       </Routes>
   );
