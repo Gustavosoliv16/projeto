@@ -1,10 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo} from "react";
 import axios from "axios";
+import "../styles/DashboardLayout.css";
 import "../styles/GerenciarEntidades.css"; 
+import EditMode from "../components/EditMode.jsx";
 
 const GerenciarSetores = () => {
     const [nomeSetor, setNomeSetor] = useState("");
     const [setores, setSetores] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const [isCadastroVisible, setIsCadastroVisible] = useState(false);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingSetor, setEditingSetor] = useState(null);
 
     const fetchSetores = async () => {
         try {
@@ -19,12 +27,45 @@ const GerenciarSetores = () => {
         fetchSetores();
     }, []);
 
-    const handleSubmit = async (e) => {
+
+const handleEdit = (setor) => {
+        setEditingSetor(setor);
+        setIsModalOpen(true);
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm("Tem certeza que deseja excluir este setor?")) {
+            try {
+                await axios.delete(`/api/setores/${id}`);
+                fetchSetores();
+                alert("Setor excluído com sucesso!");
+            } catch (error) {
+                console.error("Erro ao excluir setor:", error);
+                alert("Erro ao excluir setor.");
+            }
+        }
+    };
+
+
+    const handleSave = async (id, novoNome) => {
+        try {
+            await axios.put(`/api/setores/${id}`, { nome: novoNome });
+            fetchSetores();
+            setIsModalOpen(false);
+            alert("Setor atualizado com sucesso!");
+        } catch (error) {
+            console.error("Erro ao atualizar setor:", error);
+            alert("Erro ao atualizar setor.");
+        }
+    };
+
+    const handleCadastro = async (e) => {
         e.preventDefault();
         try {
             await axios.post('/api/setores', { nome: nomeSetor });
             setNomeSetor("");
-            fetchSetores(); 
+            fetchSetores();
+            setIsCadastroVisible(false);
             alert("Setor cadastrado com sucesso!");
         } catch (error) {
             console.error("Erro ao cadastrar setor:", error);
@@ -32,49 +73,91 @@ const GerenciarSetores = () => {
         }
     };
 
-    return (
-        <main className="entidades-container">
-            <div className="form-card-entidade">
-                <h2 className="form-title">Cadastrar Novo Setor</h2>
-                <form onSubmit={handleSubmit} className="form-inline">
-                    <input
-                        type="text"
-                        placeholder="Nome do novo setor"
-                        className="form-input"
-                        value={nomeSetor}
-                        onChange={(e) => setNomeSetor(e.target.value)}
-                        required
-                    />
-                    <button type="submit" className="btn-primary">
-                        Salvar
-                    </button>
-                </form>
-            </div>
+    const filtroSetores = useMemo(() => 
+        setores.filter(setor =>
+        setor.nome.toLowerCase().includes(searchTerm.toLowerCase())
+    ), [setores, searchTerm]);
 
-            <div className="results-card-entidade">
-                <h3 className="results-title">Setores Cadastrados</h3>
-                <table className="results-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {setores.map((setor) => (
-                            <tr key={setor.id}>
-                                <td>{setor.id}</td>
-                                <td>{setor.nome}</td>
-                                <td>
-                                    <button className="btn-secondary">Editar</button>
-                                </td>
+    return (
+  <>
+            <EditMode
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSave}
+                entity={editingSetor}
+                entityName="Setor"
+            />
+
+            <main className="dashboard-container">
+                <div className="actions-panel">
+                    <div className="actions-grid">
+                        <button 
+                            onClick={() => setIsCadastroVisible(!isCadastroVisible)} 
+                            className="action-button"
+                        >
+                            {isCadastroVisible ? 'Cancelar Cadastro' : 'Adicionar Novo Setor'}
+                        </button>
+                        <button className="action-button">Gerar Relatório</button>
+                        <button className="action-button">Importar Setores</button>
+                        <button className="action-button">Exportar para CSV</button>
+                        <button className="action-button">Visualizar Gráfico</button>
+                        <button className="action-button">Configurações</button>
+                    </div>
+
+                    {isCadastroVisible && (
+                        <div className="collapsible-form-container">
+                            <h3 className="form-title" style={{fontSize: '1.2rem', marginBottom: '1rem'}}>Cadastrar Novo Setor</h3>
+                            <form onSubmit={handleCadastro} className="form-inline">
+                                <input
+                                    type="text"
+                                    placeholder="Nome do novo setor"
+                                    className="form-input"
+                                    value={nomeSetor}
+                                    onChange={(e) => setNomeSetor(e.target.value)}
+                                    required
+                                    autoFocus
+                                />
+                                <button type="submit" className="btn-primary">Salvar</button>
+                            </form>
+                        </div>
+                    )}
+                </div>
+
+                <div className="results-panel">
+                    <div className="results-header">
+                        <h3 className="results-title">Setores Cadastrados</h3>
+                        <input
+                            type="text"
+                            placeholder="Pesquisar setor..."
+                            className="form-input search-input"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <table className="results-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Ações</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </main>
+                        </thead>
+                        <tbody>
+                            {filtroSetores.map((setor) => (
+                                <tr key={setor.id}>
+                                    <td>{setor.id}</td>
+                                    <td>{setor.nome}</td>
+                                    <td className="actions-cell">
+                                        <button onClick={() => handleEdit(setor)} className="btn-action btn-edit">Editar</button>
+                                        <button onClick={() => handleDelete(setor.id)} className="btn-action btn-delete">Excluir</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </>
     );
 }
 

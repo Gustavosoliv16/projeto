@@ -7,7 +7,7 @@ const GerenciarEquipamentos = () => {
 
     const [nome, setNome] = useState("");
     const [modelo, setModelo] = useState("");
-    const [numeroSerie, setNumeroSerie] = useState("");
+    const [NumPatrimonio, setNumPatrimonio] = useState("");
     const [idSetor, setIdSetor] = useState("");
 
     
@@ -37,13 +37,13 @@ const GerenciarEquipamentos = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const novoEquipamento = { nome, modelo, numero_serie: numeroSerie, id_setor: idSetor, status: 'Operacional' };
+            const novoEquipamento = { nome, modelo, numero_serie: NumPatrimonio, id_setor: idSetor, status: 'Operacional' };
             await axios.post('/api/equipamentos', novoEquipamento);
             
            
             setNome("");
             setModelo("");
-            setNumeroSerie("");
+            setNumPatrimonio("");
             setIdSetor("");
             fetchData();
             alert("Equipamento cadastrado com sucesso!");
@@ -69,8 +69,8 @@ const GerenciarEquipamentos = () => {
                     </div>
                  
                     <div>
-                        <label className="form-label">Número de Série</label>
-                        <input type="text" placeholder="S/N" className="form-input" value={numeroSerie} onChange={(e) => setNumeroSerie(e.target.value)} required />
+                        <label className="form-label">Patrimônio</label>
+                        <input type="text" placeholder="..." className="form-input" value={NumPatrimonio} onChange={(e) => setNumPatrimonio(e.target.value)} required />
                     </div>
                     <div>
                         <label className="form-label">Secretaria (Setor)</label>
@@ -94,7 +94,7 @@ const GerenciarEquipamentos = () => {
                             <tr>
                                 <th>Nome</th>
                                 <th>Modelo</th>
-                                <th>N/S</th>
+                                <th>Descrição</th>
                                 <th>Secretaria</th>
                                 <th>Status</th>
                                 <th>Ações</th>
