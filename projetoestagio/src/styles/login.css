@@ -1,6 +1,6 @@
 .input{
 
-    background-color: rgb(255, 255, 255);
+    background-color: #ffffff;
     width: 300px;
     height: 30px;
     margin: 2px;
@@ -68,7 +68,7 @@
     font-size: 2rem;
     font-weight: bold;
     align-items: flex-end;
-    margin-top: -6px; /* ajuste fino para aproximar as linhas */
+    margin-top: -6px; 
 }
 
 #imglogin {

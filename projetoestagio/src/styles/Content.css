@@ -1,27 +1,105 @@
+body {
+  background-color: #f0f2f5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Poppins', Helvetica, Arial, sans-serif;
+  margin: 0;
+  color: #333;
+}
+
 .main-content {
-  position: fixed;
-  margin-left: 180px; 
-  margin-top: 64px; 
-  padding: 2rem;
-  flex: 1;
-  text-align: left;
-  background: #f5f6fa;
-  min-height: calc(100vh - 64px);
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto;
+  padding: 32px;
+  background-color: #ffffff;
+  border-radius: 8px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
+  gap: 20px; 
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.search-container form {
+  width: 50%;
+  height: auto;
+  display: flex;
+  gap: 10px;
+}
+
+#inputsearch {
+  padding: 12px 16px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  box-sizing: border-box; 
+  transition: border-color 0.2s, box-shadow 0.2s;
+  border: 1px solid #333;
+  border-radius: 6px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#inputsearch:focus {
+  outline: none;
+  border-color: #007bff; 
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.search-button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.search-button:hover {
+  background-color: #0056b3; 
 }
 
 #contentbox {
-  background: #ffffff;
-  border-radius: 8px;
-  border: rgba(41, 41, 41, 0.329) solid 1px;
-  box-shadow: 0px 1px 5px 3px rgba(41, 41, 41, 0.329) inset;
-  padding: 1rem 2rem;
-  margin-top: 2rem;
-  color: #222;
+  width: 100%;
+  overflow-x: auto; 
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse; 
+  text-align: left;
+}
+
+th, td {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0; 
+}
+
+thead th {
+  font-weight: 600; 
+  color: #555;
+  background-color: #fafafa;
+}
+
+
+tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+
+td[colSpan="2"] {
+  text-align: center;
+  color: #777;
+  padding: 40px;
+}
+
+.main-content p {
+  text-align: center;
+  font-family:'Poppins', sans-serif;
+  font-style: italic ;
   font-size: 1.1rem;
-  width: 80dvh;
-  max-width: 900px;
-  min-height: 200px;
-  margin-left: auto;
-  margin-right: auto;
+  color: #3a3a3a5e;
+  padding: 50px;
 }
