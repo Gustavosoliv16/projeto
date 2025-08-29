@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import "../styles/GerenciarOrdens.css"; // Novo arquivo de estilo
+import "../styles/GerenciarOrdens.css"; 
 
 const GerenciarOrdensServico = () => {
     // Estados para o formulário de nova ordem

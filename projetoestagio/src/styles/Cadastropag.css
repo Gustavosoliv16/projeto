@@ -8,6 +8,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  
 }
 
 body {
@@ -15,34 +16,36 @@ body {
   background: white;
   background-attachment: fixed;
   color: #333;
+  
 }
 
 .forms-container {
-
+  position: relative;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.548);
   flex-direction: row;
   align-self: flex-start;
   align-items: flex-start;
   align-content: flex-start;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.548);
   grid-template-areas:
-    "cadastro pesquisa"
-    "resultados resultados";
+  
+    "cadastro pesquisa";
   gap: 2rem;
   padding: 2rem;
-
 }
-.forms-container > .form-card:nth-of-type(1) {
+
+.form-cadastro{
   grid-area: cadastro;
-}
-.forms-container > .form-card:nth-of-type(2) {
-  grid-area: pesquisa;
-}
-.results-card {
-  grid-area: resultados;
-}
 
+}
+.form-pesquisa {
+  grid-area: pesquisa;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
 
 .form-card {
   background: white;

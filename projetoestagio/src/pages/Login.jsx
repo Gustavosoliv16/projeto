@@ -33,7 +33,7 @@ const handleLogin = async (e) => {
   return (
     <form id="login-form" onSubmit={handleLogin}>
 
-      <img id="imglogin" src="./public/Brasao_caratinga.png" alt="brasaoctga" />
+      <img id="imglogin" src="/Brasao_Caratinga.png" alt="brasaoctga" />
      <div className="prefeitura-texto">
   <span className="linha-superior">Prefeitura</span>
   <span className="linha-inferior">De Caratinga</span>
