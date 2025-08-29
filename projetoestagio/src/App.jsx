@@ -1,7 +1,7 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login.jsx";
-import Content from "./components/Content.jsx";
+import Content from "./components/Pecas.jsx";
 import PrivateRoute from "./routes/PrivateRoute.jsx";
 import GerenciarUsuarios from "./pages/gerenciarUsuarios.jsx";
 import Template from "./components/Maintemplate.jsx";
@@ -29,7 +29,8 @@ function App() {
           {/* O path aqui é relativo ao pai. Como o pai é "/", o path final será "/telainicial" */}
           <Route path="telainicial" element={<Content />} />
           <Route path="usuarios-cadastro" element={<GerenciarUsuarios />} />
-          <Route path="ordens_servico" element={<GerenciarOrdensServico />} />
+
+          <Route path="ordens-servico" element={<GerenciarOrdensServico />} />
           <Route path="setores" element={<GerenciarSetores />} />
           <Route path="equipamentos" element={<GerenciarEquipamentos />} />
         </Route>

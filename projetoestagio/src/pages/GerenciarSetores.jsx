@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo} from "react";
 import axios from "axios";
-import "../styles/DashboardLayout.css";
+import "../styles/GerenciarUsuarios.css";
 import "../styles/GerenciarEntidades.css"; 
 import EditMode from "../components/EditMode.jsx";
 
@@ -8,9 +8,7 @@ const GerenciarSetores = () => {
     const [nomeSetor, setNomeSetor] = useState("");
     const [setores, setSetores] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-
     const [isCadastroVisible, setIsCadastroVisible] = useState(false);
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingSetor, setEditingSetor] = useState(null);
 
@@ -27,8 +25,7 @@ const GerenciarSetores = () => {
         fetchSetores();
     }, []);
 
-
-const handleEdit = (setor) => {
+    const handleEdit = (setor) => {
         setEditingSetor(setor);
         setIsModalOpen(true);
     };
@@ -46,7 +43,6 @@ const handleEdit = (setor) => {
         }
     };
 
-
     const handleSave = async (id, novoNome) => {
         try {
             await axios.put(`/api/setores/${id}`, { nome: novoNome });
@@ -61,6 +57,10 @@ const handleEdit = (setor) => {
 
     const handleCadastro = async (e) => {
         e.preventDefault();
+        if (nomeSetor.trim() === '') {
+            alert('O nome do setor não pode ser vazio.');
+            return;
+        }
         try {
             await axios.post('/api/setores', { nome: nomeSetor });
             setNomeSetor("");
@@ -79,7 +79,7 @@ const handleEdit = (setor) => {
     ), [setores, searchTerm]);
 
     return (
-  <>
+        <>
             <EditMode
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -88,44 +88,38 @@ const handleEdit = (setor) => {
                 entityName="Setor"
             />
 
-            <main className="dashboard-container">
-                <div className="actions-panel">
-                    <div className="actions-grid">
-                        <button 
-                            onClick={() => setIsCadastroVisible(!isCadastroVisible)} 
-                            className="action-button"
-                        >
-                            {isCadastroVisible ? 'Cancelar Cadastro' : 'Adicionar Novo Setor'}
-                        </button>
-                        <button className="action-button">Gerar Relatório</button>
-                        <button className="action-button">Importar Setores</button>
-                        <button className="action-button">Exportar para CSV</button>
-                        <button className="action-button">Visualizar Gráfico</button>
-                        <button className="action-button">Configurações</button>
-                    </div>
+            <div className="setores-container">
 
-                    {isCadastroVisible && (
-                        <div className="collapsible-form-container">
-                            <h3 className="form-title" style={{fontSize: '1.2rem', marginBottom: '1rem'}}>Cadastrar Novo Setor</h3>
-                            <form onSubmit={handleCadastro} className="form-inline">
-                                <input
-                                    type="text"
-                                    placeholder="Nome do novo setor"
-                                    className="form-input"
-                                    value={nomeSetor}
-                                    onChange={(e) => setNomeSetor(e.target.value)}
-                                    required
-                                    autoFocus
-                                />
-                                <button type="submit" className="btn-primary">Salvar</button>
-                            </form>
-                        </div>
-                    )}
+                <div className="actions-header">
+                    <button onClick={() => setIsCadastroVisible(!isCadastroVisible)} className="action-button">
+                        {isCadastroVisible ? 'Cancelar' : 'Adicionar Setor'}
+                    </button>
+                    <button className="action-button">Configurações</button>
+                    <button className="action-button">Gerar Relatório</button>
+                    <button className="action-button" disabled>Ação Futura</button>
                 </div>
 
-                <div className="results-panel">
+                {isCadastroVisible && (
+                    <div className="cadastro-card">
+                        <h3 className="card-title">Cadastrar Novo Setor</h3>
+                        <form onSubmit={handleCadastro} className="form-inline">
+                            <input
+                                type="text"
+                                placeholder="Nome do novo setor"
+                                className="form-input"
+                                value={nomeSetor}
+                                onChange={(e) => setNomeSetor(e.target.value)}
+                                required
+                                autoFocus
+                            />
+                            <button type="submit" className="btn-primary">Salvar</button>
+                        </form>
+                    </div>
+                )}
+
+                <div className="results-card">
                     <div className="results-header">
-                        <h3 className="results-title">Setores Cadastrados</h3>
+                        <h3 className="card-title">Setores Cadastrados</h3>
                         <input
                             type="text"
                             placeholder="Pesquisar setor..."
@@ -134,29 +128,31 @@ const handleEdit = (setor) => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <table className="results-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filtroSetores.map((setor) => (
-                                <tr key={setor.id}>
-                                    <td>{setor.id}</td>
-                                    <td>{setor.nome}</td>
-                                    <td className="actions-cell">
-                                        <button onClick={() => handleEdit(setor)} className="btn-action btn-edit">Editar</button>
-                                        <button onClick={() => handleDelete(setor.id)} className="btn-action btn-delete">Excluir</button>
-                                    </td>
+                    <div className="table-wrapper">
+                        <table className="results-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Ações</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {filtroSetores.map((setor) => (
+                                    <tr key={setor.id}>
+                                        <td>{setor.id}</td>
+                                        <td>{setor.nome}</td>
+                                        <td className="actions-cell">
+                                            <button onClick={() => handleEdit(setor)} className="btn-action btn-edit">Editar</button>
+                                            <button onClick={() => handleDelete(setor.id)} className="btn-action btn-delete">Excluir</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </main>
+            </div>
         </>
     );
 }

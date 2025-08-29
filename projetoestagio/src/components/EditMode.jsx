@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import '../styles/Mode.css'; // Vamos criar este arquivo de estilo a seguir
+import { useState, useEffect } from 'react';
+import '../styles/Mode.css';
 
 const EditMode = ({ isOpen, onClose, onSave, entity, entityName }) => {
   const [name, setName] = useState('');
