@@ -1,5 +1,5 @@
 import express from "express";
-import { registrarMovimentacao, listarMovimentacoes } from "../controllers/movimentacaoEstoqueController.js";
+import { registrarMovimentacao, listarMovimentacoes } from "../controllers/movimentacaoEstoque.js";
 
 const router = express.Router();
 

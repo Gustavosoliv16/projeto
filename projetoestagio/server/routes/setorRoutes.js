@@ -5,7 +5,7 @@ import {
   buscarSetorPorId,
   atualizarSetor,
   deletarSetor
-} from "../controllers/setorController.js";
+} from "../controllers/setoresController.js";
 const router = express.Router();
 
 router.get("/setores", listarSetor);

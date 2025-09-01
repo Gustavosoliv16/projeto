@@ -1,33 +1,20 @@
-import express from "express";
+import db from "../database.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import db from "./database.js";
 
-const router = express.Router();
+export function listarUsuarios(req, res) {
+  db.get((err, conn) => {
+    if (err) return res.status(500).json({ error: err.message });
 
-router.post("/cadastro", async (req, res) => {
-    const { NOME_USUARIO, ID_SETOR, CPF, EMAIL, TIPO_USUARIO, SENHA } = req.body;
-
-    const salt = await bcrypt.genSalt(10);
-    const senhaHash = await bcrypt.hash(SENHA, salt);
-
-    db.get((err, conn) => {
-        if (err) return res.status(500).json({ error: err.message });
-
-        const sql = `
-          INSERT INTO USUARIOS (NOME_USUARIO, ID_SETOR, CPF, EMAIL, TIPO_USUARIO, SENHA) 
-          VALUES (?, ?, ?, ?, ?, ?)
-        `;
-
-        conn.query(sql, [NOME_USUARIO, ID_SETOR, CPF, EMAIL, TIPO_USUARIO, senhaHash], (err2) => {
-            conn.detach();
-            if (err2) return res.status(500).json({ error: err2.message });
-            return res.status(201).json({ message: "Usuário cadastrado com sucesso" });
-        });
+    conn.query("SELECT * FROM USUARIOS", (err2, result) => {
+      conn.detach();
+      if (err2) return res.status(500).json({ error: err2.message });
+      res.json(result);
     });
-});
+  });
+}
 
-router.post("/login", (req, res) => {
+export function login (req, res){
     const { EMAIL, SENHA } = req.body;
 
     if (!EMAIL || !SENHA) {
@@ -55,7 +42,7 @@ router.post("/login", (req, res) => {
 
                 const payload = { id: usuario.ID_USUARIOS, nome: usuario.NOME_USUARIO };
                 const secret = "uma-chave-secreta-bem-forte-para-testes";
-                const token = jwt.sign(payload, secret, { expiresIn: '20h' });
+                const token = jwt.sign(payload, secret, { expiresIn: '10h' });
 
                 return res.status(200).json({ message: "login efetuado", token: token });
 
@@ -65,27 +52,87 @@ router.post("/login", (req, res) => {
             }
         });
     });
-});
+}
 
-router.get("/cadastro", (req, res) => {
-    const { search } = req.query;
-    if (!search) {
-        return res.status(200).json([]);
-    }
-    db.get((err, conn) => {
-        if (err) return res.status(500).json({ error: "erro na conexao com o banco de dados" });
+export function cadastrarUsuario(req, res) {
 
-        const sql = "SELECT * FROM USUARIOS WHERE NOME_USUARIO LIKE ?";
-        const searchTerm = `%${search}%`;
+  const { NOME_USUARIO, CPF, EMAIL, TIPO_USUARIO, SENHA, ID_SETOR } = req.body;
 
-        conn.query(sql, [searchTerm], (err2, results) => {
-            conn.detach();
-            if (err2) {
-                return res.status(500).json({ error: "erro ao executar a busca pelo nome" });
-            }
-            return res.status(200).json(results);
+  bcrypt.hash(SENHA, 10, (err, senhaCriptografada) => {
+    if (err) return res.status(500).json({ error: "Erro ao criptografar senha." });
+
+    db.get((errConn, conn) => {
+      if (errConn) return res.status(500).json({ error: errConn.message });
+
+      const sql = `
+        INSERT INTO USUARIOS 
+          (NOME_USUARIO, CPF, EMAIL, TIPO_USUARIO, SENHA, ID_SETOR) 
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+
+      const dados = [NOME_USUARIO, CPF, EMAIL, TIPO_USUARIO, senhaCriptografada, ID_SETOR];
+
+      conn.query(sql, dados, (err2) => {
+        conn.detach();
+        if (err2) return res.status(500).json({ error: err2.message });
+
+        res.status(201).json({
+          message: "Usuário cadastrado com sucesso",
+          usuario: { NOME_USUARIO, CPF, EMAIL, TIPO_USUARIO, ID_SETOR }
         });
+      });
     });
-});
+  });
+}
 
-export default router;
+export function atualizarUsuario(req, res) {
+  const { id } = req.params;
+  const { NOME_USUARIO, DEPARTAMENTO, CPF, EMAIL, TIPO_USUARIO, SENHA } = req.body;
+
+  db.get((err, conn) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const sql = `
+      UPDATE USUARIOS 
+      SET NOME_USUARIO = ?, 
+          CPF = ?, 
+          EMAIL = ?, 
+          TIPO_USUARIO = ?, 
+          SENHA = ?
+      WHERE ID_USUARIOS = ?
+    `;
+
+    conn.query(
+      sql,
+      [NOME_USUARIO, DEPARTAMENTO, CPF, EMAIL, TIPO_USUARIO, SENHA, parseInt(id)],
+      (err2) => {
+        conn.detach();
+        if (err2) return res.status(500).json({ error: err2.message });
+
+        res.status(200).json({
+          message: "Usuário atualizado com sucesso",
+          usuario: { ID_USUARIOS: id, NOME_USUARIO, DEPARTAMENTO, CPF, EMAIL, TIPO_USUARIO, SENHA }
+        });
+      }
+    );
+  });
+}
+
+export function deletarUsuario(req, res) {
+  const id = parseInt(req.params.id);
+
+  db.get((err, conn) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const sql = "DELETE FROM USUARIOS WHERE ID_USUARIOS = ?";
+
+    conn.query(sql, [id], (err2) => {
+      conn.detach();
+      if (err2) return res.status(500).json({ error: err2.message });
+
+      res.status(200).json({
+        message: `Usuário com ID ${id} deletado com sucesso.`,
+      });
+    });
+  });
+}
