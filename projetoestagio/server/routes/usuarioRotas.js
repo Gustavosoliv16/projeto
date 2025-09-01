@@ -5,8 +5,7 @@ import {
   atualizarUsuario,
   deletarUsuario,
   login,
-} from "../controllers/UserController.js";
-import { listarUsuariosPaginado } from "../controllers/userpage.js";
+} from "../controllers/usuariosController.js";
 
 const router = express.Router();
 

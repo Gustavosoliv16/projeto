@@ -1,6 +1,6 @@
 import db from "../database.js";
 import bcrypt from "bcrypt";
-import schemaUsuario from "../schemas/usuarioSchema.js";
+import jwt from "jsonwebtoken";
 
 export function listarUsuarios(req, res) {
   db.get((err, conn) => {
@@ -14,9 +14,47 @@ export function listarUsuarios(req, res) {
   });
 }
 
+export function login (req, res){
+    const { EMAIL, SENHA } = req.body;
+
+    if (!EMAIL || !SENHA) {
+        return res.status(400).json({ error: "Email e senha obrigatório" });
+    }
+
+    db.get((err, conn) => {
+        if (err) return res.status(500).json({ error: "Erro de conexão com o banco de dados" });
+
+        const sql = "SELECT * FROM USUARIOS WHERE EMAIL = ?";
+        conn.query(sql, [EMAIL], async (err2, result) => {
+            conn.detach();
+            if (err2) return res.status(500).json({ error: "erro interno no servidor" });
+
+            if (!result || result.length === 0) {
+                return res.status(401).json({ error: "credenciais invalidas" });
+            }
+
+            const usuario = result[0];
+            try {
+                const senhaexiste = await bcrypt.compare(SENHA, usuario.SENHA);
+                if (!senhaexiste) {
+                    return res.status(401).json({ error: "credenciais invalidas" });
+                }
+
+                const payload = { id: usuario.ID_USUARIOS, nome: usuario.NOME_USUARIO };
+                const secret = "uma-chave-secreta-bem-forte-para-testes";
+                const token = jwt.sign(payload, secret, { expiresIn: '10h' });
+
+                return res.status(200).json({ message: "login efetuado", token: token });
+
+            } catch (bcryptError) {
+                console.log('erro bcrypt', bcryptError);
+                return res.status(500).json({ error: "Erro ao verificar credencias" });
+            }
+        });
+    });
+}
+
 export function cadastrarUsuario(req, res) {
-  const { error } = schemaUsuario.validate(req.body);
-  if (error) return res.status(400).json({ error: error.details[0].message });
 
   const { NOME_USUARIO, CPF, EMAIL, TIPO_USUARIO, SENHA, ID_SETOR } = req.body;
 
