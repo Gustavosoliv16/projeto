@@ -1,7 +1,7 @@
 import express from "express";
 import {
     listarEstoque,
-} from "../controllers/estoquePecasController.js";
+} from "../controllers/estoqueController.js";
 const router = express.Router();
 
 router.get("/estoque", listarEstoque);

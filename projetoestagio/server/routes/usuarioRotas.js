@@ -4,7 +4,9 @@ import {
   cadastrarUsuario,
   atualizarUsuario,
   deletarUsuario,
-} from "../controllers/usuariosController.js";
+  login,
+} from "../controllers/UserController.js";
+import { listarUsuariosPaginado } from "../controllers/userpage.js";
 
 const router = express.Router();
 
@@ -12,5 +14,6 @@ router.get("/cadastro", listarUsuarios);
 router.post("/cadastro", cadastrarUsuario);
 router.put("/cadastro/:id", atualizarUsuario);
 router.delete("/cadastro/:id", deletarUsuario);
+router.post("/login", login)
 
 export default router;
