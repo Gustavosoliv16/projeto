@@ -45,7 +45,7 @@ const GerenciarSetores = () => {
 
     const handleSave = async (id, novoNome) => {
         try {
-            await axios.put(`/api/setores/${id}`, { nome: novoNome });
+            await axios.put(`/api/setores/${id}`, { NOME_SETOR: novoNome });
             fetchSetores();
             setIsModalOpen(false);
             alert("Setor atualizado com sucesso!");
@@ -62,7 +62,7 @@ const GerenciarSetores = () => {
             return;
         }
         try {
-            await axios.post('/api/setores', { nome: nomeSetor });
+            await axios.post('/api/setores', { NOME_SETOR: nomeSetor });
             setNomeSetor("");
             fetchSetores();
             setIsCadastroVisible(false);
@@ -137,16 +137,17 @@ const GerenciarSetores = () => {
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {filtroSetores.map((setor) => (
-                                    <tr key={setor.id}>
-                                        <td>{setor.id}</td>
-                                        <td>{setor.nome}</td>
+                            <tbody>   
+                             {filtroSetores.map((setor) => (
+                                    <tr key={setor.ID_SETOR}>
+                                        <td>{setor.ID_SETOR}</td>
+                                        <td>{setor.NOME_SETOR}</td>
                                         <td className="actions-cell">
                                             <button onClick={() => handleEdit(setor)} className="btn-action btn-edit">Editar</button>
-                                            <button onClick={() => handleDelete(setor.id)} className="btn-action btn-delete">Excluir</button>
+                                            <button onClick={() => handleDelete(setor.ID_SETOR)} className="btn-action btn-delete">Excluir</button>
                                         </td>
                                     </tr>
+
                                 ))}
                             </tbody>
                         </table>
