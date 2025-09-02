@@ -75,7 +75,7 @@ const GerenciarSetores = () => {
 
     const filtroSetores = useMemo(() => 
         setores.filter(setor =>
-        setor.nome.toLowerCase().includes(searchTerm.toLowerCase())
+        (setor.NOME_SETOR || "").toLowerCase().includes(searchTerm.toLowerCase())
     ), [setores, searchTerm]);
 
     return (
