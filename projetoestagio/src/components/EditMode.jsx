@@ -7,7 +7,7 @@ const EditMode = ({ isOpen, onClose, onSave, entity, entityName }) => {
   useEffect(() => {
  
     if (entity) {
-      setName(entity.NOME_SETOR || '');
+      setName(entity.nome || '');
     }
   }, [entity]);
 
@@ -17,7 +17,7 @@ const EditMode = ({ isOpen, onClose, onSave, entity, entityName }) => {
 
   const handleSave = () => {
     if (name.trim()) {
-      onSave(entity.ID_SETOR, name.trim());
+      onSave(entity.id, name.trim());
     } else {
       alert(`O nome do ${entityName} não pode estar em branco.`);
     }

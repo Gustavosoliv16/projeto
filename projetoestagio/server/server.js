@@ -1,20 +1,20 @@
 import express from "express";
 import cors from "cors";
-import usuariosRoutes from "./routes/userRoutes.js";
-import servicosRoutes from "./routes/servicoRoutes.js"
-import solicitacoesRoutes from "./routes/solicitacaoRoutes.js";
-import setoresRoutes from "./routes/setorRoutes.js";
-import historicoRoutes from "./routes/historicoSolicitacaoRoutes.js";
-import pecasRoutes from "./routes/pecaRoutes.js";
-import solicitacoesPecasRoutes from "./routes/solicitacaopecasRoutes.js";
-import estoquePecasRoutes from "./routes/estoqueRoutes.js";
-import movimentacaoEstoqueRoutes from "./routes/movimentacaoEstoqueRoutes.js";
+import usuariosRoutes from "./routes/usuarioRotas.js";
+import servicosRoutes from "./routes/tipoServicoRotas.js"
+import solicitacoesRoutes from "./routes/solicitacaoRotas.js";
+import setoresRoutes from "./routes/setorRotas.js";
+import historicoRoutes from "./routes/historicoSolicitacaoRotas.js";
+import pecasRoutes from "./routes/pecasRotas.js";
+import solicitacoesPecasRoutes from "./routes/solicitacaopecasRotas.js";
+import estoquePecasRoutes from "./routes/estoquePecasRotas.js";
+import movimentacaoEstoqueRoutes from "./routes/movimentacaoEstoqueRotas.js";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
