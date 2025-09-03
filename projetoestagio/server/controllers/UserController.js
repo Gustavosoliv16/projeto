@@ -3,12 +3,41 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export function listarUsuarios(req, res) {
-  db.get((err, conn) => {
-    if (err) return res.status(500).json({ error: err.message });
 
-    conn.query("SELECT * FROM USUARIOS", (err2, result) => {
+  const { search = "" } = req.query;
+
+  db.get((err, conn) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    const params = [];
+    let sql = `
+      SELECT 
+        ID_USUARIOS, NOME_USUARIO, EMAIL, CPF, TIPO_USUARIO, ID_SETOR 
+      FROM USUARIOS
+      `;
+
+    // Se houver um termo de busca, adiciona a cláusula WHERE
+    if (search) {
+      
+      sql += `
+        WHERE 
+          NOME_USUARIO CONTAINING ? OR 
+          EMAIL CONTAINING ? OR 
+          CPF CONTAINING ?
+      `;
+      
+      params.push(search, search, search);
+    }
+    
+    sql += ' ROWS 10';
+
+    conn.query(sql, params, (err2, result) => {
       conn.detach();
-      if (err2) return res.status(500).json({ error: err2.message });
+      if (err2) {
+        return res.status(500).json({ error: err2.message });
+      }
       res.json(result);
     });
   });
@@ -34,6 +63,11 @@ export function login (req, res){
             }
 
             const usuario = result[0];
+
+            if(!usuario.SENHA){
+              console.error('nao existe este usuario')
+              return res.status(401).json({error:"credenciais invalidas"});
+            }
             try {
                 const senhaexiste = await bcrypt.compare(SENHA, usuario.SENHA);
                 if (!senhaexiste) {

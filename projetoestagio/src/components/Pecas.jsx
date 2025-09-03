@@ -16,7 +16,7 @@ const Content = () => {
                 const response = await axios.get('/api/pecas');
                 setPecas(response.data);
                 setPecasExibidas(response.data);
-                setError(null); 
+                setError("sem dados"); 
             } catch (err) {
                 setError("Não foi possível carregar os dados.");
                 console.error(err);
@@ -28,17 +28,17 @@ const Content = () => {
     }, []);
 
     const handleSearchSubmit = (event) => {
-        event.preventDefault();
+    event.preventDefault();
 
-        if (searchTerm.trim() === "") {
-            setPecasExibidas(pecas); 
-        } else {
-            const termoLowerCase = searchTerm.toLowerCase();
-            const filtrados = pecas.filter(peca => 
-                peca.nome.toLowerCase().includes(termoLowerCase) ||
-                peca.modelo.toLowerCase().includes(termoLowerCase)
-            );
-            setPecasExibidas(filtrados);
+    if (searchTerm.trim() === "") {
+        setPecasExibidas(pecas);
+    } else {
+        const termoLowerCase = searchTerm.toLowerCase();
+        const filtrados = pecas.filter(peca =>
+            (peca.nome || "").toLowerCase().includes(termoLowerCase) ||
+            (peca.modelo || "").toLowerCase().includes(termoLowerCase)
+        );
+        setPecasExibidas(filtrados);
         }
     };
 
@@ -51,7 +51,6 @@ if (error) {
                 <p className="status-message error-message">{error}</p>
             </div>;
 }
-
     return (
         <div className="main-content">
             <div className="search-container">

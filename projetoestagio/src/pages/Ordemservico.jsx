@@ -3,26 +3,23 @@ import axios from "axios";
 import "../styles/GerenciarOrdens.css"; 
 
 const GerenciarOrdensServico = () => {
-    // Estados para o formulário de nova ordem
+
     const [solicitante, setSolicitante] = useState("");
     const [idSetor, setIdSetor] = useState("");
     const [idTipoServico, setIdTipoServico] = useState("");
     const [descricao, setDescricao] = useState("");
 
-    // Estados para carregar dados dos selects (setores e tipos de serviço)
     const [setores, setSetores] = useState([]);
     const [tiposServico, setTiposServico] = useState([]);
 
-    // Estados para a pesquisa
     const [resultados, setResultados] = useState([]);
     const [loading, setLoading] = useState(false);
     const [pesquisaRealizada, setPesquisaRealizada] = useState(false);
 
-    // Efeito para carregar dados dos setores e tipos de serviço no início
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Substitua pelas suas rotas de API reais
+                
                 const resSetores = await axios.get('/api/setores');
                 const resTipos = await axios.get('/api/tipos-servico');
                 setSetores(resSetores.data);
@@ -39,8 +36,15 @@ const GerenciarOrdensServico = () => {
         try {
             const novaOrdem = { solicitante, idSetor, idTipoServico, descricao, status: 'Aberto' };
             const response = await axios.post("/api/solicitacoes", novaOrdem);
-            console.log("Ordem de Serviço cadastrada:", response.data);
-            // Limpar formulário
+            console.log("Ordem de Serviço cadastrada:", response.data);         
+/*{
+ "ID_SOLICITACAO":1,
+ "DESCRICAO":"telefone nao liga",
+ "STATUS":"aberto",
+ "ID_USUARIO_SOLICITANTE":4,
+ "ID_USUARIO_RESPONSAVEL":4,
+ "ID_SERVICO":1
+}*/
             setSolicitante("");
             setIdSetor("");
             setIdTipoServico("");
@@ -49,6 +53,18 @@ const GerenciarOrdensServico = () => {
         } catch (error) {
             console.error("Erro ao cadastrar Ordem de Serviço:", error);
             alert("Erro ao criar Ordem de Serviço.");
+        }
+    };
+
+    const handleDetalhes = async (e, id) => {
+        e.preventDefault();
+        try {
+            const response = await axios.get(`/api/solicitacoes/${id}`);
+            console.log("Detalhes da Ordem de Serviço:", response.data);
+            response.data.DESCRICAO
+            
+        } catch (error) {
+            console.error("Erro ao buscar detalhes da Ordem de Serviço:", error);
         }
     };
 
@@ -70,7 +86,7 @@ const GerenciarOrdensServico = () => {
 
     return (
         <main className="ordens-container">
-            {/* Card de Cadastro */}
+            
             <div className="form-card">
                 <h2 className="form-title">Abrir Nova Ordem de Serviço</h2>
                 <form onSubmit={handleCadastroSubmit} className="form-grid">
@@ -82,14 +98,14 @@ const GerenciarOrdensServico = () => {
                         <label htmlFor="setor" className="form-label">Setor</label>
                         <select id="setor" className="form-input" value={idSetor} onChange={(e) => setIdSetor(e.target.value)} required>
                             <option value="">Selecione o setor</option>
-                            {setores.map(setor => <option key={setor.id} value={setor.id}>{setor.nome}</option>)}
+                            {setores.map(setor => <option key={setor.ID_SETOR} value={setor.ID_SETOR}>{setor.NOME_SETOR}</option>)}
                         </select>
                     </div>
                     <div className="full-width">
                         <label htmlFor="tipo_servico" className="form-label">Tipo de Serviço</label>
                         <select id="tipo_servico" className="form-input" value={idTipoServico} onChange={(e) => setIdTipoServico(e.target.value)} required>
                             <option value="">Selecione o tipo de serviço</option>
-                            {tiposServico.map(tipo => <option key={tipo.id} value={tipo.id}>{tipo.nome}</option>)}
+                            {tiposServico.map(tipo => <option key={tipo.ID_SERVICO}>{tipo.NOME_SERVICO}</option>)}
                         </select>
                     </div>
                     <div className="full-width">
@@ -104,7 +120,6 @@ const GerenciarOrdensServico = () => {
                 </form>
             </div>
 
-            {/* Card de Pesquisa */}
             <div className="form-card">
                 <h2 className="form-title">Consultar Ordens de Serviço</h2>
                 <form onSubmit={handleSearch} className="search-form">
@@ -115,7 +130,6 @@ const GerenciarOrdensServico = () => {
                 </form>
             </div>
 
-            {/* Card de Resultados */}
             {pesquisaRealizada && (
                 <div className="results-card">
                     <h3 className="results-title">Resultados da Pesquisa</h3>
@@ -125,7 +139,7 @@ const GerenciarOrdensServico = () => {
                         <table className="results-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>Nº do Chamado</th>
                                     <th>Solicitante</th>
                                     <th>Setor</th>
                                     <th>Data</th>
@@ -135,14 +149,14 @@ const GerenciarOrdensServico = () => {
                             </thead>
                             <tbody>
                                 {resultados.map((os) => (
-                                    <tr key={os.id}>
-                                        <td>{os.id}</td>
-                                        <td>{os.solicitante}</td>
-                                        <td>{os.setor.nome}</td>
-                                        <td>{new Date(os.createdAt).toLocaleDateString()}</td>
-                                        <td>{os.status}</td>
+                                    <tr key={os.ID_SOLICITACAO}>
+                                        <td>{os.ID_SOLICITACAO}</td>
+                                        <td>{os.ID_SOLICITANTE}</td>
+                                        <td>{os.NOME_SETOR}</td>
+                                        <td>{new Date(os.DATA_ABERTURA).toLocaleDateString() || 'data indisponivel'}</td>
+                                        <td>{os.STATUS}</td>
                                         <td>
-                                            <button className="btn-secondary">Detalhes</button>
+                                                <button onClick={(e) => handleDetalhes(e, os.ID_SOLICITACAO)} type="submit" className="btn-secondary">Detalhes</button>
                                         </td>
                                     </tr>
                                 ))}

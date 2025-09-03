@@ -25,6 +25,12 @@
   width: auto;
 }
 
+.user-name img {
+  height: 45px;
+  width: 45px;
+  border-radius: 50%;
+}
+
 .topbar-logo span {
   font-family: 'Poppins', sans-serif;
   font-size: 1.1rem;

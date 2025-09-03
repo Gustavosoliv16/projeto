@@ -19,15 +19,15 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-app.use("/", usuariosRoutes);
-app.use("/", servicosRoutes);
-app.use("/", solicitacoesRoutes);
-app.use("/", setoresRoutes);
-app.use("/", historicoRoutes);
-app.use("/", pecasRoutes);
-app.use("/", solicitacoesPecasRoutes);
-app.use("/", estoquePecasRoutes);
-app.use("/", movimentacaoEstoqueRoutes);
+app.use("/api", usuariosRoutes);
+app.use("/api", servicosRoutes);
+app.use("/api", solicitacoesRoutes);
+app.use("/api", setoresRoutes);
+app.use("/api", historicoRoutes);
+app.use("/api", pecasRoutes);
+app.use("/api", solicitacoesPecasRoutes);
+app.use("/api", estoquePecasRoutes);
+app.use("/api", movimentacaoEstoqueRoutes);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

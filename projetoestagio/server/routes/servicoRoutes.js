@@ -7,9 +7,9 @@ import {
 } from "../controllers/tipoServicoController.js";
 const router = express.Router();
 
-router.get("/servicos", listarServicos);
-router.post("/servicos", cadastrarServico);
-router.put("/servicos/:id", atualizarServico);
-router.delete("/servicos/:id", deletarServico);
+router.get("/tipos-servico", listarServicos);
+router.post("/tipos-servico", cadastrarServico);
+router.put("/tipos-servico/:id", atualizarServico);
+router.delete("/tipos-servico/:id", deletarServico);
 
 export default router;

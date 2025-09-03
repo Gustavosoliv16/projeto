@@ -2,11 +2,21 @@ import db from "../database.js";
 
 export function cadastrarSetor(req, res) {
   const { NOME_SETOR } = req.body;
+  
+  if (!NOME_SETOR || NOME_SETOR.trim() === "") {
+    return res.status(400).json({ error: "O nome do setor não pode ser vazio." });
+  }
+
+  const regexApenasLetras = /^[A-Za-z\s]+$/;
+
+    if (!regexApenasLetras.test(NOME_SETOR)) {
+    return res.status(400).json({ error: "O nome do setor deve conter apenas letras e espaços." });
+  }
 
   db.get((err, conn) => {
     if (err) return res.status(500).json({ error: err.message });
 
-    conn.query("INSERT INTO SETOR (NOME_SETOR) VALUES (?)", [NOME_SETOR], (err2) => {
+      conn.query("INSERT INTO SETOR (NOME_SETOR) VALUES (?)", [NOME_SETOR.trim()], (err2) => {
       conn.detach();
       if (err2) return res.status(500).json({ error: err2.message });
 

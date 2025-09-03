@@ -16,7 +16,7 @@ const Topbar = () => {
            
             {user ? (
                 <div className="user-info">
-                    <span className="user-name"> <strong>{user.nome || user.email}</strong></span>
+                    <span className="user-name"> <img src="user_profile.png" alt="perfil" /> <strong>{user.nome || user.email}</strong></span>
                     <button className="logout-button" onClick={logout}>
                         Sair
                     </button>
