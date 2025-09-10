@@ -8,7 +8,6 @@
 .main-layout {
   display: flex;
   flex: 1;
-  /* Adiciona um padding no topo igual à altura do Topbar */
   padding-top: 70px;
   overflow: hidden;
 }
@@ -20,13 +19,10 @@
   transition: margin-left 0.5s ease-in-out;
   margin-left: 0;
 }
-
-/* Quando a sidebar está aberta, empurra o conteúdo */
 .content-area.sidebar-open {
-  margin-left: 160px; /* Largura da Sidebar */
+  margin-left: 160px; 
 }
 
-/* Em telas menores, a sidebar irá sobrepor o conteúdo */
 @media (max-width: 1024px) {
   .content-area.sidebar-open {
     margin-left: 0;

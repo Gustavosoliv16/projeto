@@ -1,15 +1,24 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import "../styles/GerenciarOrdens.css"; 
+import {useAuth} from "../context/AuthContext";
+import "../styles/GerenciarOrdens.css";
+
+const formatarData = (dataValor) => {
+    if (!dataValor) return 'N/A';
+    const data = new Date(dataValor);
+    if (isNaN(data.getTime())) return 'Data Inválida';
+    return data.toLocaleDateString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric'
+    });
+};
+
 
 const GerenciarOrdensServico = () => {
 
-    const [solicitante, setSolicitante] = useState("");
-    const [idSetor, setIdSetor] = useState("");
+    const {user} = useAuth();
+    
     const [idTipoServico, setIdTipoServico] = useState("");
     const [descricao, setDescricao] = useState("");
-
-    const [setores, setSetores] = useState([]);
     const [tiposServico, setTiposServico] = useState([]);
 
     const [resultados, setResultados] = useState([]);
@@ -17,54 +26,45 @@ const GerenciarOrdensServico = () => {
     const [pesquisaRealizada, setPesquisaRealizada] = useState(false);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchDataParaFormularios = async () => {
             try {
-                
-                const resSetores = await axios.get('/api/setores');
                 const resTipos = await axios.get('/api/tipos-servico');
-                setSetores(resSetores.data);
                 setTiposServico(resTipos.data);
             } catch (error) {
                 console.error("Erro ao carregar dados iniciais:", error);
+                alert("Erro ao carregar dados dos formulários.");
             }
         };
-        fetchData();
+        fetchDataParaFormularios();
     }, []);
 
     const handleCadastroSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const novaOrdem = { solicitante, idSetor, idTipoServico, descricao, status: 'Aberto' };
-            const response = await axios.post("/api/solicitacoes", novaOrdem);
-            console.log("Ordem de Serviço cadastrada:", response.data);         
-/*{
- "ID_SOLICITACAO":1,
- "DESCRICAO":"telefone nao liga",
- "STATUS":"aberto",
- "ID_USUARIO_SOLICITANTE":4,
- "ID_USUARIO_RESPONSAVEL":4,
- "ID_SERVICO":1
-}*/
-            setSolicitante("");
-            setIdSetor("");
+
+            if (!user || !user.id) {
+            alert("Erro: Utilizador não autenticado. Por favor, faça login novamente.");
+            return;
+        }
+            try {
+                const novaOrdem = {
+                    ID_USUARIO_SOLICITANTE: user.id,
+                    ID_SERVICO: idTipoServico,
+                    DESCRICAO: descricao
+                };
+
+            await axios.post("/api/solicitacoes", novaOrdem);
+            alert("Ordem de Serviço criada com sucesso!");
+            
             setIdTipoServico("");
             setDescricao("");
-            alert("Ordem de Serviço criada com sucesso!");
+
+            if (pesquisaRealizada) {
+                setPesquisaRealizada(false);
+                setResultados([]);
+            }
         } catch (error) {
             console.error("Erro ao cadastrar Ordem de Serviço:", error);
-            alert("Erro ao criar Ordem de Serviço.");
-        }
-    };
-
-    const handleDetalhes = async (e, id) => {
-        e.preventDefault();
-        try {
-            const response = await axios.get(`/api/solicitacoes/${id}`);
-            console.log("Detalhes da Ordem de Serviço:", response.data);
-            response.data.DESCRICAO
-            
-        } catch (error) {
-            console.error("Erro ao buscar detalhes da Ordem de Serviço:", error);
+            alert(error.response?.data?.error || "Erro ao criar Ordem de Serviço.");
         }
     };
 
@@ -72,10 +72,17 @@ const GerenciarOrdensServico = () => {
         e.preventDefault();
         setLoading(true);
         setPesquisaRealizada(true);
-        const searchValue = e.target.elements.inputsearch.value;
+        const searchValue = e.target.elements.inputsearch.value.toLowerCase();
         try {
-            const response = await axios.get(`/api/solicitacoes?search=${searchValue}`);
-            setResultados(response.data || []);
+            const response = await axios.get(`/api/solicitacoes`); 
+            
+            const filtrados = response.data.filter(os =>
+                (os.NOME_SOLICITANTE || '').toLowerCase().includes(searchValue) ||
+                (os.STATUS || '').toLowerCase().includes(searchValue) ||
+                (os.NOME_SERVICO || '').toLowerCase().includes(searchValue) ||
+                (os.NOME_SETOR || '').toLowerCase().includes(searchValue)
+            );
+            setResultados(filtrados || []);
         } catch (error) {
             console.error("Erro ao buscar ordens de serviço:", error);
             setResultados([]);
@@ -84,33 +91,46 @@ const GerenciarOrdensServico = () => {
         }
     };
 
+    const handleDetalhes = (e, os) => {
+        e.preventDefault();
+        const detalhes = `
+            Detalhes do Chamado #${os.ID_SOLICITACAO}:
+            ---------------------------------
+            Solicitante: ${os.NOME_SOLICITANTE || 'N/A'}
+            Responsável: ${os.NOME_RESPONSAVEL || 'Não atribuído'}
+            Setor: ${os.NOME_SETOR || 'N/A'}
+            Serviço: ${os.NOME_SERVICO || 'N/A'}
+            Status: ${os.STATUS}
+            Data: ${formatarData(os.DATA_CRIACAO)}
+            ---------------------------------
+            Descrição: ${os.DESCRICAO}
+        `;
+        alert(detalhes);
+    };
+
     return (
         <main className="ordens-container">
             
             <div className="form-card">
                 <h2 className="form-title">Abrir Nova Ordem de Serviço</h2>
                 <form onSubmit={handleCadastroSubmit} className="form-grid">
-                    <div>
-                        <label htmlFor="solicitante" className="form-label">Solicitante</label>
-                        <input id="solicitante" type="text" placeholder="Nome do solicitante" className="form-input" value={solicitante} onChange={(e) => setSolicitante(e.target.value)} required />
+                   <div className="full-width">
+                        <label className="form-label">Solicitante</label>
+                        <input 
+                            type="text" 
+                            className="form-input" 
+                            value={user ? user.nome : "Carregando..."} 
+                            disabled
+                        />
                     </div>
+
                     <div>
-                        <label htmlFor="setor" className="form-label">Setor</label>
-                        <select id="setor" className="form-input" value={idSetor} onChange={(e) => setIdSetor(e.target.value)} required>
-                            <option value="">Selecione o setor</option>
-                            {setores.map(setor => <option key={setor.ID_SETOR} value={setor.ID_SETOR}>{setor.NOME_SETOR}</option>)}
-                        </select>
-                    </div>
-                    <div className="full-width">
-                        <label htmlFor="tipo_servico" className="form-label">Tipo de Serviço</label>
-                        <select id="tipo_servico" className="form-input" value={idTipoServico} onChange={(e) => setIdTipoServico(e.target.value)} required>
-                            <option value="">Selecione o tipo de serviço</option>
-                            {tiposServico.map(tipo => <option key={tipo.ID_SERVICO}>{tipo.NOME_SERVICO}</option>)}
-                        </select>
+                        <label htmlFor="tipo_servico" className="form-label">Nº do patrimonio</label>
+                        <input id="tipo_servico" className="form-input" placeholder="Digite o número do patrimônio" value={idTipoServico} onChange={(e) => setIdTipoServico(e.target.value)} required />
                     </div>
                     <div className="full-width">
                         <label htmlFor="descricao" className="form-label">Descrição do Problema</label>
-                        <textarea id="descricao" placeholder="Descreva o problema ou a solicitação..." className="form-textarea" value={descricao} onChange={(e) => setDescricao(e.target.value)} required />
+                        <textarea id="descricao" placeholder="Descreva o problema..." className="form-textarea" value={descricao} onChange={(e) => setDescricao(e.target.value)} required />
                     </div>
                     <div className="full-width mt-4">
                         <button type="submit" className="btn-primary">
@@ -123,7 +143,7 @@ const GerenciarOrdensServico = () => {
             <div className="form-card">
                 <h2 className="form-title">Consultar Ordens de Serviço</h2>
                 <form onSubmit={handleSearch} className="search-form">
-                    <input id="inputsearch" name="inputsearch" type="text" placeholder="Pesquisar por solicitante, setor ou status..." className="form-input search-input" />
+                    <input id="inputsearch" name="inputsearch" type="text" placeholder="Pesquisar..." className="form-input search-input" />
                     <button id="search-button" type="submit" className="btn-primary btn-search">
                         Pesquisar
                     </button>
@@ -139,24 +159,29 @@ const GerenciarOrdensServico = () => {
                         <table className="results-table">
                             <thead>
                                 <tr>
-                                    <th>Nº do Chamado</th>
+                                    <th>Nº</th>
+                                    <th>Serviço</th>
                                     <th>Solicitante</th>
+                                    <th>Responsável</th>
                                     <th>Setor</th>
                                     <th>Data</th>
                                     <th>Status</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
+                           
                             <tbody>
                                 {resultados.map((os) => (
                                     <tr key={os.ID_SOLICITACAO}>
                                         <td>{os.ID_SOLICITACAO}</td>
-                                        <td>{os.ID_SOLICITANTE}</td>
-                                        <td>{os.NOME_SETOR}</td>
-                                        <td>{new Date(os.DATA_ABERTURA).toLocaleDateString() || 'data indisponivel'}</td>
+                                        <td>{os.NOME_SERVICO || 'Não especificado'}</td>
+                                        <td>{os.NOME_SOLICITANTE || 'Usuário não encontrado'}</td>
+                                        <td>{os.NOME_RESPONSAVEL || 'Não atribuído'}</td>
+                                        <td>{os.NOME_SETOR || 'Não informado'}</td>
+                                        <td>{formatarData(os.DATA_CRIACAO)}</td>
                                         <td>{os.STATUS}</td>
                                         <td>
-                                                <button onClick={(e) => handleDetalhes(e, os.ID_SOLICITACAO)} type="submit" className="btn-secondary">Detalhes</button>
+                                            <button onClick={(e) => handleDetalhes(e, os)} className="btn-secondary">Detalhes</button>
                                         </td>
                                     </tr>
                                 ))}

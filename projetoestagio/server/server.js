@@ -9,12 +9,13 @@ import pecasRoutes from "./routes/pecasRotas.js";
 import solicitacoesPecasRoutes from "./routes/solicitacaopecasRotas.js";
 import estoquePecasRoutes from "./routes/estoquePecasRotas.js";
 import movimentacaoEstoqueRoutes from "./routes/movimentacaoEstoqueRotas.js";
+import dashboardRoutes from "./routes/dashboardRotas.js"
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const app = express();
-const PORT = 3001;
+const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -28,6 +29,7 @@ app.use("/api", pecasRoutes);
 app.use("/api", solicitacoesPecasRoutes);
 app.use("/api", estoquePecasRoutes);
 app.use("/api", movimentacaoEstoqueRoutes);
+app.use("/api", dashboardRoutes);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

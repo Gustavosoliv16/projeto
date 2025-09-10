@@ -1,9 +1,19 @@
 import db from "../database.js";
 
 export function cadastrarSolicitacao(req, res) {
-  const { ID_USUARIO_SOLICITANTE, ID_USUARIO_RESPONSAVEL, DESCRICAO } = req.body;
 
-  if (!ID_USUARIO_SOLICITANTE || !DESCRICAO) {
+  const { 
+    ID_USUARIO_SOLICITANTE, 
+    ID_SERVICO, 
+    DESCRICAO,
+    EQUIPAMENTOS,
+    MARCA,
+    MODELO,
+    PATRIMONIO,
+    DEFEITO_RELATADO
+  } = req.body;
+
+  if (!ID_USUARIO_SOLICITANTE || !DESCRICAO || !ID_SERVICO || !EQUIPAMENTOS) {
     return res.status(400).json({ error: "Preencha todos os campos obrigatórios." });
   }
 
@@ -12,14 +22,22 @@ export function cadastrarSolicitacao(req, res) {
 
     const sql = `
       INSERT INTO SOLICITACOES (
-        ID_USUARIO_SOLICITANTE, DESCRICAO, STATUS
-      ) VALUES (?, ?, ?)
+        ID_USUARIO_SOLICITANTE, DESCRICAO, STATUS, DATA_CRIACAO, ID_SERVICO,
+        EQUIPAMENTOS, MARCA, MODELO, PATRIMONIO, DEFEITO_RELATADO
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const params = [
-      ID_USUARIO_SOLICITANTE,
+         ID_USUARIO_SOLICITANTE,
       DESCRICAO,
-      "ABERTA"
+      "ABERTA",
+      new Date(),
+      ID_SERVICO,
+      EQUIPAMENTOS,
+      MARCA || null,
+      MODELO || null,
+      PATRIMONIO || null,
+      DEFEITO_RELATADO || null
     ];
 
     conn.query(sql, params, (err2) => {
@@ -30,7 +48,6 @@ export function cadastrarSolicitacao(req, res) {
       }
       res.status(201).json({
         message: "Solicitação criada com sucesso!",
-        dados: { ID_USUARIO_SOLICITANTE, ID_USUARIO_RESPONSAVEL, DESCRICAO, STATUS: "ABERTA" }
       });
     });
   });
@@ -40,9 +57,36 @@ export function listarSolicitacoes(req, res) {
   db.get((err, conn) => {
     if (err) return res.status(500).json({ error: err.message });
 
-    conn.query("SELECT * FROM SOLICITACOES", (err2, result) => {
+    const sql = `
+      SELECT 
+        s.ID_SOLICITACAO,
+        s.DESCRICAO,
+        s.STATUS,
+        s.DATA_CRIACAO,
+        u_sol.NOME_USUARIO AS NOME_SOLICITANTE,
+        u_resp.NOME_USUARIO AS NOME_RESPONSAVEL,
+        st.NOME_SETOR,
+        ts.NOME_SERVICO
+      FROM 
+        SOLICITACOES s
+      LEFT JOIN 
+        USUARIOS u_sol ON s.ID_USUARIO_SOLICITANTE = u_sol.ID_USUARIOS
+      LEFT JOIN 
+        USUARIOS u_resp ON s.ID_USUARIO_RESPONSAVEL = u_resp.ID_USUARIOS
+      LEFT JOIN
+        SETOR st ON u_sol.ID_SETOR = st.ID_SETOR
+      LEFT JOIN
+        TIPO_SERVICO ts ON s.ID_SERVICO = ts.ID_SERVICO
+      ORDER BY
+        s.ID_SOLICITACAO DESC
+    `;
+
+    conn.query(sql, (err2, result) => {
       conn.detach();
-      if (err2) return res.status(500).json({ error: err2.message });
+      if (err2) {
+        console.error("Erro na consulta SQL de solicitações:", err2);
+        return res.status(500).json({ error: err2.message });
+      }
       res.json(result);
     });
   });

@@ -24,6 +24,19 @@ const BuscaUsuarios = () => {
         }
     }
 
+    const handleDelete = async (id) => {
+    if (window.confirm("Tem certeza que deseja excluir este usuário?")) {
+        try {
+            await axios.delete(`/api/cadastro/${id}`);
+            setResultados((prev) => prev.filter((usuario) => usuario.id !== id));
+            alert("Usuário excluído com sucesso!");
+        } catch (error) {
+            console.error("Erro ao excluir usuário:", error);
+            alert("Erro ao excluir usuário.");
+        }
+    }
+};
+
     return (
         <div className="form-pesquisa">
 
@@ -76,6 +89,13 @@ const BuscaUsuarios = () => {
                               onClick={() => console.log('Editar usuário:', usuario.id)}
                             >
                               Editar
+                            </button>
+                            <button 
+                              className="btn-primary btn-delete" 
+                              style={{marginTop: '0.2rem', padding: '0.4rem 0.8rem', fontSize: '0.8rem'}}
+                              onClick={() => handleDelete(usuario.id)}
+                            >
+                              Excluir
                             </button>
                           </td>
                         </tr>

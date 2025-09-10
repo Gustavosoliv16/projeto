@@ -18,7 +18,7 @@ const Sidebar = ({ isOpen, setOpen }) => {
 
           <li className="listarotas"><Link to="/equipamentos" className="paginacao">Equipamentos</Link></li>
 
-          <li className="listarotas"><Link to="/setores" className="paginacao">Secretarias</Link></li>
+          <li className="listarotas"><Link to="/setores" className="paginacao">Setores</Link></li>
           
           <li className="listarotas"><Link to="/usuarios-cadastro" className="paginacao">Usuários</Link></li>
         </ul>

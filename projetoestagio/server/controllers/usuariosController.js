@@ -14,20 +14,15 @@ export function listarUsuarios(req, res) {
     const params = [];
     let sql = `
       SELECT 
-        ID_USUARIOS, NOME_USUARIO, EMAIL, CPF, TIPO_USUARIO, ID_SETOR 
+        ID_USUARIOS, NOME_USUARIO, TIPO_USUARIO, ID_SETOR 
       FROM USUARIOS
       `;
 
-    // Se houver um termo de busca, adiciona a cláusula WHERE
     if (search) {
-      
       sql += `
         WHERE 
-          NOME_USUARIO CONTAINING ? OR 
-          EMAIL CONTAINING ? OR 
-          CPF CONTAINING ?
+          NOME_USUARIO CONTAINING ?
       `;
-      
       params.push(search, search, search);
     }
     

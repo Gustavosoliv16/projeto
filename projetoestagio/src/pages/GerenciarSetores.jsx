@@ -46,7 +46,6 @@ const GerenciarSetores = () => {
     const handleSave = async (id, novoNome) => {
         try {
             await axios.put(`/api/setores/${id}`, { NOME_SETOR: novoNome });
-            await axios.put(`/api/setores/${id}`, { NOME_SETOR: novoNome });
             fetchSetores();
             setIsModalOpen(false);
             alert("Setor atualizado com sucesso!");
@@ -63,7 +62,6 @@ const GerenciarSetores = () => {
             return;
         }
         try {
-            await axios.post('/api/setores', { NOME_SETOR: nomeSetor });
             await axios.post('/api/setores', { NOME_SETOR: nomeSetor });
             setNomeSetor("");
             fetchSetores();
@@ -146,7 +144,6 @@ const GerenciarSetores = () => {
                                         <td>{setor.NOME_SETOR}</td>
                                         <td className="actions-cell">
                                             <button onClick={() => handleEdit(setor)} className="btn-action btn-edit">Editar</button>
-                                            <button onClick={() => handleDelete(setor.ID_SETOR)} className="btn-action btn-delete">Excluir</button>
                                             <button onClick={() => handleDelete(setor.ID_SETOR)} className="btn-action btn-delete">Excluir</button>
                                         </td>
                                     </tr>

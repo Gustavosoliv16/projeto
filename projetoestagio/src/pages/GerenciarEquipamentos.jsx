@@ -19,10 +19,11 @@ const GerenciarEquipamentos = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const resEquipamentos = await axios.get('/api/equipamentos');
+            const resEquipamentos = await axios.get('/api/pecas');
             const resSetores = await axios.get('/api/setores');
             setEquipamentos(resEquipamentos.data);
             setSetores(resSetores.data);
+            console.log(resSetores.data);
         } catch (error) {
             console.error("Erro ao buscar dados:", error);
         } finally {
@@ -38,7 +39,7 @@ const GerenciarEquipamentos = () => {
         e.preventDefault();
         try {
             const novoEquipamento = { nome, modelo, numero_serie: NumPatrimonio, id_setor: idSetor, status: 'Operacional' };
-            await axios.post('/api/equipamentos', novoEquipamento);
+            await axios.post('/api/pecas', novoEquipamento);
             
            
             setNome("");
@@ -60,23 +61,23 @@ const GerenciarEquipamentos = () => {
                 <form onSubmit={handleSubmit} className="form-grid-entidade">
                  
                     <div>
-                        <label className="form-label">Nome do Equipamento</label>
+                        <label className="form-label">NOME DO EQUIPAMENTO</label>
                         <input type="text" placeholder="Ex: Computador Dell" className="form-input" value={nome} onChange={(e) => setNome(e.target.value)} required />
                     </div>
                     <div>
-                        <label className="form-label">Modelo</label>
+                        <label className="form-label">MODELO</label>
                         <input type="text" placeholder="Ex: OptiPlex 3080" className="form-input" value={modelo} onChange={(e) => setModelo(e.target.value)} />
                     </div>
                  
                     <div>
-                        <label className="form-label">Patrimônio</label>
-                        <input type="text" placeholder="..." className="form-input" value={NumPatrimonio} onChange={(e) => setNumPatrimonio(e.target.value)} required />
+                        <label className="form-label">PATRIMÔNIO</label>
+                        <input type="text" placeholder="xxx-xx" className="form-input" value={NumPatrimonio} onChange={(e) => setNumPatrimonio(e.target.value)} required />
                     </div>
                     <div>
-                        <label className="form-label">Secretaria (Setor)</label>
+                        <label className="form-label">SETOR</label>
                         <select className="form-input" value={idSetor} onChange={(e) => setIdSetor(e.target.value)} required>
-                            <option value="">Selecione a secretaria</option>
-                            {setores.map(setor => <option key={setor.id} value={setor.id}>{setor.nome}</option>)}
+                            <option value="">Selecione o setor</option>
+                            {setores.map(setor => <option key={setor.ID_SETOR} value={setor.ID_SETOR}>{setor.NOME_SETOR}</option>)}
                         </select>
                     </div>
                     
