@@ -14,7 +14,7 @@ const Sidebar = ({ isOpen, setOpen }) => {
        <ul>
           <li className="listarotas"><Link to="/ordens-servico" className="paginacao">Ordens de Serviço</Link></li>
           
-          <li className="listarotas"><Link to="/telainicial" className="paginacao">Peças</Link></li>
+          <li className="listarotas"><Link to="/telainicial" className="paginacao">Chamadas</Link></li>
 
           <li className="listarotas"><Link to="/equipamentos" className="paginacao">Equipamentos</Link></li>
 

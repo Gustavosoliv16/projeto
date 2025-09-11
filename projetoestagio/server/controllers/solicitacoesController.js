@@ -13,7 +13,7 @@ export function cadastrarSolicitacao(req, res) {
     DEFEITO_RELATADO
   } = req.body;
 
-  if (!ID_USUARIO_SOLICITANTE || !DESCRICAO || !ID_SERVICO || !EQUIPAMENTOS) {
+  if (!ID_USUARIO_SOLICITANTE || !DESCRICAO || !ID_SERVICO ) {
     return res.status(400).json({ error: "Preencha todos os campos obrigatórios." });
   }
 

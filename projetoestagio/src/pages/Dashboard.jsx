@@ -35,8 +35,8 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard-container">
-            <h1 className="dashboard-title">Painel de Controlo</h1>
-            
+            <h1 className="dashboard-title">Status das últimas chamadas</h1>
+
             <div className="stats-cards">
                 <div className="card">
                     <h2>{stats.ordensAbertas}</h2>
@@ -44,11 +44,11 @@ const Dashboard = () => {
                 </div>
                 <div className="card">
                     <h2>{stats.totalEquipamentos}</h2>
-                    <p>Equipamentos Cadastrados</p>
+                    <p>Resolvidos</p>
                 </div>
                 <div className="card">
                     <h2>{stats.totalUsuarios}</h2>
-                    <p>Utilizadores no Sistema</p>
+                    <p>Pendentes</p>
                 </div>
                 <Link to="/ordens-servico" className="card card-action">
                     <h2>+</h2>
@@ -63,18 +63,22 @@ const Dashboard = () => {
                         <thead>
                             <tr>
                                 <th>Nº</th>
-                                <th>Descrição</th>
                                 <th>Solicitante</th>
                                 <th>Setor</th>
+                                <th>Patrimônio</th>
+                                <th>Equipamento</th>
+                                <th>Descrição</th>
                             </tr>
                         </thead>
                         <tbody>
                             {stats.ultimasSolicitacoes.map(os => (
                                 <tr key={os.ID_SOLICITACAO}>
                                     <td>#{os.ID_SOLICITACAO}</td>
-                                    <td>{os.DESCRICAO}</td>
                                     <td>{os.NOME_SOLICITANTE || 'N/A'}</td>
                                     <td>{os.NOME_SETOR || 'N/A'}</td>
+                                    <td>{os.PATRIMONIO || 'N/A'}</td>
+                                    <td>{os.NOME_EQUIPAMENTOS || 'N/A'}</td>
+                                    <td>{os.DESCRICAO || 'N/A'}</td>
                                 </tr>
                             ))}
                         </tbody>
