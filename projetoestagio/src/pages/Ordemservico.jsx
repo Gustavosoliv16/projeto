@@ -15,30 +15,16 @@ const formatarData = (dataValor) => {
 const GerenciarOrdensServico = () => {
     const { user } = useAuth();
     
-    // 1. Estados corrigidos para o formulário
-    const [idTipoServico, setIdTipoServico] = useState("");
-    const [patrimonio, setPatrimonio] = useState(""); // Novo estado para o patrimônio
-    const [descricao, setDescricao] = useState("");
-    const [tiposServico, setTiposServico] = useState([]); // Para popular o dropdown
+    const [patrimonio, setPatrimonio] = useState(""); 
+    const [defeito, setDefeito] = useState("");
 
     const [resultados, setResultados] = useState([]);
     const [loading, setLoading] = useState(false);
     const [pesquisaRealizada, setPesquisaRealizada] = useState(false);
 
-    // 2. useEffect agora busca os tipos de serviço para o dropdown
     useEffect(() => {
-        const fetchTiposServico = async () => {
-            try {
-                const res = await axios.get('/api/tipos-servico');
-                setTiposServico(res.data);
-            } catch (error) {
-                console.error("Erro ao carregar tipos de serviço:", error);
-            }
-        };
-        fetchTiposServico();
     }, []);
 
-    // 3. Lógica de submissão corrigida
     const handleCadastroSubmit = async (e) => {
         e.preventDefault();
 
@@ -49,20 +35,15 @@ const GerenciarOrdensServico = () => {
         try {
             const novaOrdem = {
                 ID_USUARIO_SOLICITANTE: user.id,
-                ID_SERVICO: idTipoServico, // Agora envia o ID do serviço correto
-                PATRIMONIO: patrimonio,   // E o patrimônio no campo correto
-                DESCRICAO: descricao
+                PATRIMONIO: patrimonio,
+                DEFEITO_RELATADO: defeito
             };
 
             await axios.post("/api/solicitacoes", novaOrdem);
             alert("Ordem de Serviço criada com sucesso!");
-            
-            // Limpa o formulário
-            setIdTipoServico("");
             setPatrimonio("");
-            setDescricao("");
+            setDefeito("");
 
-            // Se uma pesquisa foi feita, limpa os resultados para forçar uma nova busca
             if (pesquisaRealizada) {
                 handleSearch({ preventDefault: () => {}, target: { elements: { inputsearch: { value: '' } } } });
             }
@@ -79,14 +60,13 @@ const GerenciarOrdensServico = () => {
         const searchValue = e.target.elements.inputsearch.value.toLowerCase();
         try {
             const response = await axios.get(`/api/solicitacoes`); 
-            
             const filtrados = response.data.filter(os =>
                 (os.NOME_SOLICITANTE || '').toLowerCase().includes(searchValue) ||
                 (os.STATUS || '').toLowerCase().includes(searchValue) ||
-                (os.NOME_SERVICO || '').toLowerCase().includes(searchValue) ||
-                (os.NOME_SETOR || '').toLowerCase().includes(searchValue)
+                (os.NOME_SETOR || '').toLowerCase().includes(searchValue)            
             );
-            setResultados(filtrados || []);
+            const ordenados = filtrados.sort((a, b) => a.ID_SOLICITACAO - b.ID_SOLICITACAO);
+            setResultados(ordenados || []);
         } catch (error) {
             console.error("Erro ao buscar ordens de serviço:", error);
             setResultados([]);
@@ -103,13 +83,11 @@ const GerenciarOrdensServico = () => {
             Solicitante: ${os.NOME_SOLICITANTE || 'N/A'}
             Responsável: ${os.NOME_RESPONSAVEL || 'Não atribuído'}
             Setor: ${os.NOME_SETOR || 'N/A'}
-            Serviço: ${os.NOME_SERVICO || 'N/A'}
             Status: ${os.STATUS}
             Data: ${formatarData(os.DATA_CRIACAO)}
             ---------------------------------
-            Descrição: ${os.DESCRICAO}
-        `;
-        alert(detalhes);
+            Descrição: ${os.DEFEITO_RELATADO || 'N/A'}`;
+            console.log(detalhes);
     };
 
     return (
@@ -122,26 +100,10 @@ const GerenciarOrdensServico = () => {
                         <label className="form-label">Solicitante</label>
                         <input type="text" className="form-input" value={user ? user.nome : "Carregando..."} disabled />
                     </div>
-                    <div>
-                        <label htmlFor="tipo_servico" className="form-label">Tipo de Serviço</label>
-                        <select 
-                            id="tipo_servico" 
-                            className="form-input" 
-                            value={idTipoServico} 
-                            onChange={(e) => setIdTipoServico(e.target.value)} 
-                            required
-                        >
-                            <option value="">Selecione um serviço...</option>
-                            {tiposServico.map(servico => (
-                                <option key={servico.ID_SERVICO} value={servico.ID_SERVICO}>
-                                    {servico.NOME_SERVICO}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+
 
                     <div>
-                        <label htmlFor="patrimonio" className="form-label">Nº do Patrimônio (Opcional)</label>
+                        <label htmlFor="patrimonio" className="form-label">Nº do Patrimônio </label>
                         <input 
                             id="patrimonio" 
                             className="form-input" 
@@ -153,7 +115,7 @@ const GerenciarOrdensServico = () => {
                     
                     <div className="full-width">
                         <label htmlFor="descricao" className="form-label">Descrição do Problema</label>
-                        <textarea id="descricao" placeholder="Descreva o problema..." className="form-textarea" value={descricao} onChange={(e) => setDescricao(e.target.value)} required />
+                        <textarea id="descricao" placeholder="Descreva o problema..." className="form-textarea" value={defeito} onChange={(e) => setDefeito(e.target.value)} required />
                     </div>
 
                     <div className="full-width mt-4">
@@ -183,7 +145,6 @@ const GerenciarOrdensServico = () => {
                             <thead>
                                 <tr>
                                     <th>Nº</th>
-                                    <th>Serviço</th>
                                     <th>Solicitante</th>
                                     <th>Responsável</th>
                                     <th>Setor</th>
@@ -194,9 +155,9 @@ const GerenciarOrdensServico = () => {
                             </thead>
                            
                             <tbody>
-                                {resultados.map((os) => (
+                                {resultados.map((os, index) => (
                                     <tr key={os.ID_SOLICITACAO}>
-                                        <td>{os.ID_SOLICITACAO}</td>
+                                        <td>#{index + 1}</td>
                                         <td>{os.NOME_SERVICO || 'Não especificado'}</td>
                                         <td>{os.NOME_SOLICITANTE || 'Usuário não encontrado'}</td>
                                         <td>{os.NOME_RESPONSAVEL || 'Não atribuído'}</td>

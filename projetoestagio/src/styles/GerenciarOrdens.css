@@ -1,21 +1,8 @@
 .ordens-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas:
-    "cadastro pesquisa"
-    "resultados resultados";
+
   gap: 2rem;
   padding: 2rem;
-}
-
-.ordens-container > .form-card:nth-of-type(1) {
-  grid-area: cadastro;
-}
-.ordens-container > .form-card:nth-of-type(2) {
-  grid-area: pesquisa;
-}
-.results-card {
-  grid-area: resultados;
 }
 
 .form-card, .results-card {

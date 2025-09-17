@@ -1,20 +1,14 @@
 import db from "../database.js";
 
 export function cadastrarSolicitacao(req, res) {
-
   const { 
     ID_USUARIO_SOLICITANTE, 
-    ID_SERVICO, 
-    DESCRICAO,
-    EQUIPAMENTOS,
-    MARCA,
-    MODELO,
     PATRIMONIO,
-    DEFEITO_RELATADO
+    DEFEITO_RELATADO 
   } = req.body;
 
-  if (!ID_USUARIO_SOLICITANTE || !DESCRICAO || !ID_SERVICO ) {
-    return res.status(400).json({ error: "Preencha todos os campos obrigatórios." });
+  if (!ID_USUARIO_SOLICITANTE || !DEFEITO_RELATADO) {
+    return res.status(400).json({ error: "O solicitante e a descrição do defeito são obrigatórios." });
   }
 
   db.get((err, conn) => {
@@ -22,22 +16,16 @@ export function cadastrarSolicitacao(req, res) {
 
     const sql = `
       INSERT INTO SOLICITACOES (
-        ID_USUARIO_SOLICITANTE, DESCRICAO, STATUS, DATA_CRIACAO, ID_SERVICO,
-        EQUIPAMENTOS, MARCA, MODELO, PATRIMONIO, DEFEITO_RELATADO
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ID_USUARIO_SOLICITANTE, STATUS, DATA_CRIACAO, PATRIMONIO, DEFEITO_RELATADO
+      ) VALUES (?, ?, ?, ?, ?)
     `;
 
     const params = [
-         ID_USUARIO_SOLICITANTE,
-      DESCRICAO,
+      ID_USUARIO_SOLICITANTE,
       "ABERTA",
       new Date(),
-      ID_SERVICO,
-      EQUIPAMENTOS,
-      MARCA || null,
-      MODELO || null,
       PATRIMONIO || null,
-      DEFEITO_RELATADO || null
+      DEFEITO_RELATADO
     ];
 
     conn.query(sql, params, (err2) => {
@@ -60,13 +48,12 @@ export function listarSolicitacoes(req, res) {
     const sql = `
       SELECT 
         s.ID_SOLICITACAO,
-        s.DESCRICAO,
         s.STATUS,
         s.DATA_CRIACAO,
+        s.DEFEITO_RELATADO,
         u_sol.NOME_USUARIO AS NOME_SOLICITANTE,
         u_resp.NOME_USUARIO AS NOME_RESPONSAVEL,
-        st.NOME_SETOR,
-        ts.NOME_SERVICO
+        st.NOME_SETOR
       FROM 
         SOLICITACOES s
       LEFT JOIN 
@@ -75,8 +62,6 @@ export function listarSolicitacoes(req, res) {
         USUARIOS u_resp ON s.ID_USUARIO_RESPONSAVEL = u_resp.ID_USUARIOS
       LEFT JOIN
         SETOR st ON u_sol.ID_SETOR = st.ID_SETOR
-      LEFT JOIN
-        TIPO_SERVICO ts ON s.ID_SERVICO = ts.ID_SERVICO
       ORDER BY
         s.ID_SOLICITACAO DESC
     `;
@@ -166,40 +151,39 @@ export function deletarSolicitacao(req, res) {
 }
 
 export function responderSolicitacao(req,res){
-
   const idSolicitacao = parseInt(req.params.id);
-  const {solucao } = req.body;
+  const { solucao } = req.body;
 
   if (!solucao || solucao.trim() === "") {
     return res.status(400).json({ error: "O campo de solucao e obrigatorio"});
   }
-db.get((err,conn)=> {
-  if(err) return res.status(500).json({error: err.message});
+  db.get((err,conn)=> {
+    if(err) return res.status(500).json({error: err.message});
 
- const sql = ` UPDATE SOLICITACOES
- SET  
-    STATUS = ?,
-    DEFEITO_ENCONTRADO = ?,
-    DATA_CONCLUSAO = ?
-  WHERE ID_SOLICITACAO = ?`;
+    const sql = ` UPDATE SOLICITACOES
+      SET 
+        STATUS = ?,
+        DEFEITO_ENCONTRADO = ?,
+        DATA_CONCLUSAO = ?
+      WHERE ID_SOLICITACAO = ?`;
 
-  const params = [
-    "FECHADA",
-    solucao,
-    new Date(),
-    idSolicitacao
-  ];
+    const params = [
+      "FECHADA",
+      solucao,
+      new Date(),
+      idSolicitacao
+    ];
 
-  conn.query(sql, params, (err2) => {
-      conn.detach();
-      if (err2) {
-        console.error("Erro ao responder solicitação:", err2);
-        return res.status(500).json({ error: err2.message });
-      }
+    conn.query(sql, params, (err2) => {
+        conn.detach();
+        if (err2) {
+          console.error("Erro ao responder solicitação:", err2);
+          return res.status(500).json({ error: err2.message });
+        }
 
-      res.status(200).json({
-        message: `Solicitação ${idSolicitacao} foi respondida e fechada com sucesso.`,
+        res.status(200).json({
+          message: `Solicitação ${idSolicitacao} foi respondida e fechada com sucesso.`,
+        });
       });
-    });
   });
 }
