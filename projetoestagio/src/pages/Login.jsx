@@ -20,7 +20,7 @@ const handleLogin = async (e) => {
     const response = await axios.post("/api/login", { EMAIL, SENHA });
     const { token } = response.data;
     login(token);
-    navigate("/telainicial");
+    navigate("/tela-inicial");
 
   } catch (error) {
     console.error("Login failed:", error);

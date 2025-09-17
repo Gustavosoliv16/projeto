@@ -13,6 +13,7 @@
 }
 
 .topbar-logo {
+  
   display: flex;
   align-items: center;
   gap: 12px; 
@@ -21,32 +22,40 @@
 }
 
 .topbar-logo img {
-  height: 45px; 
+  height: 64px; 
   width: auto;
 }
 
-.user-name img {
-  height: 45px;
-  width: 45px;
-  border-radius: 50%;
-}
 
 .topbar-logo span {
   font-family: 'Poppins', sans-serif;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 16px; 
+  gap: 16px;
+}
+
+.user-info a.profile-link {
+  text-decoration: none; 
+  color: inherit;
 }
 
 .user-name {
   font-family: 'Poppins', sans-serif;
   font-weight: 500;
-  color: #000000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-name img {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
 }
 
 .logout-button, .login-button {
@@ -59,7 +68,7 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  text-decoration: none; 
+  text-decoration: none;
   text-align: center;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }

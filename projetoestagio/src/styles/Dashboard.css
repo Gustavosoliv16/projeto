@@ -79,3 +79,38 @@
     text-align: left;
     border-bottom: 1px solid #f0f0f0;
 }
+
+#aberto
+{
+    font-family: 'Poppins', sans-serif;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+}
+
+#fechado
+{
+    color: rgb(32, 223, 64);
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+}
+
+#pendente{
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    color: rgb(233, 211, 19);
+}
+
+#novo{
+    font-weight: bold;
+    font-family: 'Poppins', sans-serif;
+}
+
+.card.active{
+    border: 2px solid #00796b;
+    background-color: #e0f2f1;
+
+}
+
+.card:not(.card-action){
+    cursor: pointer;
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import {useAuth} from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import "../styles/GerenciarOrdens.css";
 
 const formatarData = (dataValor) => {
@@ -12,55 +12,59 @@ const formatarData = (dataValor) => {
     });
 };
 
-
 const GerenciarOrdensServico = () => {
-
-    const {user} = useAuth();
+    const { user } = useAuth();
     
+    // 1. Estados corrigidos para o formulário
     const [idTipoServico, setIdTipoServico] = useState("");
+    const [patrimonio, setPatrimonio] = useState(""); // Novo estado para o patrimônio
     const [descricao, setDescricao] = useState("");
-    const [tiposServico, setTiposServico] = useState([]);
+    const [tiposServico, setTiposServico] = useState([]); // Para popular o dropdown
 
     const [resultados, setResultados] = useState([]);
     const [loading, setLoading] = useState(false);
     const [pesquisaRealizada, setPesquisaRealizada] = useState(false);
 
+    // 2. useEffect agora busca os tipos de serviço para o dropdown
     useEffect(() => {
-        const fetchDataParaFormularios = async () => {
+        const fetchTiposServico = async () => {
             try {
-                const resTipos = await axios.get('/api/tipos-servico');
-                setTiposServico(resTipos.data);
+                const res = await axios.get('/api/tipos-servico');
+                setTiposServico(res.data);
             } catch (error) {
-                console.error("Erro ao carregar dados iniciais:", error);
-                alert("Erro ao carregar dados dos formulários.");
+                console.error("Erro ao carregar tipos de serviço:", error);
             }
         };
-        fetchDataParaFormularios();
+        fetchTiposServico();
     }, []);
 
+    // 3. Lógica de submissão corrigida
     const handleCadastroSubmit = async (e) => {
         e.preventDefault();
 
-            if (!user || !user.id) {
-            alert("Erro: Utilizador não autenticado. Por favor, faça login novamente.");
+        if (!user || !user.id) {
+            alert("Erro: Utilizador não autenticado.");
             return;
         }
-            try {
-                const novaOrdem = {
-                    ID_USUARIO_SOLICITANTE: user.id,
-                    ID_SERVICO: idTipoServico,
-                    DESCRICAO: descricao
-                };
+        try {
+            const novaOrdem = {
+                ID_USUARIO_SOLICITANTE: user.id,
+                ID_SERVICO: idTipoServico, // Agora envia o ID do serviço correto
+                PATRIMONIO: patrimonio,   // E o patrimônio no campo correto
+                DESCRICAO: descricao
+            };
 
             await axios.post("/api/solicitacoes", novaOrdem);
             alert("Ordem de Serviço criada com sucesso!");
             
+            // Limpa o formulário
             setIdTipoServico("");
+            setPatrimonio("");
             setDescricao("");
 
+            // Se uma pesquisa foi feita, limpa os resultados para forçar uma nova busca
             if (pesquisaRealizada) {
-                setPesquisaRealizada(false);
-                setResultados([]);
+                handleSearch({ preventDefault: () => {}, target: { elements: { inputsearch: { value: '' } } } });
             }
         } catch (error) {
             console.error("Erro ao cadastrar Ordem de Serviço:", error);
@@ -116,22 +120,42 @@ const GerenciarOrdensServico = () => {
                 <form onSubmit={handleCadastroSubmit} className="form-grid">
                    <div className="full-width">
                         <label className="form-label">Solicitante</label>
-                        <input 
-                            type="text" 
+                        <input type="text" className="form-input" value={user ? user.nome : "Carregando..."} disabled />
+                    </div>
+                    <div>
+                        <label htmlFor="tipo_servico" className="form-label">Tipo de Serviço</label>
+                        <select 
+                            id="tipo_servico" 
                             className="form-input" 
-                            value={user ? user.nome : "Carregando..."} 
-                            disabled
-                        />
+                            value={idTipoServico} 
+                            onChange={(e) => setIdTipoServico(e.target.value)} 
+                            required
+                        >
+                            <option value="">Selecione um serviço...</option>
+                            {tiposServico.map(servico => (
+                                <option key={servico.ID_SERVICO} value={servico.ID_SERVICO}>
+                                    {servico.NOME_SERVICO}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div>
-                        <label htmlFor="tipo_servico" className="form-label">Nº do patrimonio</label>
-                        <input id="tipo_servico" className="form-input" placeholder="Digite o número do patrimônio" value={idTipoServico} onChange={(e) => setIdTipoServico(e.target.value)} required />
+                        <label htmlFor="patrimonio" className="form-label">Nº do Patrimônio (Opcional)</label>
+                        <input 
+                            id="patrimonio" 
+                            className="form-input" 
+                            placeholder="Digite o número do patrimônio" 
+                            value={patrimonio} 
+                            onChange={(e) => setPatrimonio(e.target.value)} 
+                        />
                     </div>
+                    
                     <div className="full-width">
                         <label htmlFor="descricao" className="form-label">Descrição do Problema</label>
                         <textarea id="descricao" placeholder="Descreva o problema..." className="form-textarea" value={descricao} onChange={(e) => setDescricao(e.target.value)} required />
                     </div>
+
                     <div className="full-width mt-4">
                         <button type="submit" className="btn-primary">
                             Abrir Chamado
@@ -139,7 +163,6 @@ const GerenciarOrdensServico = () => {
                     </div>
                 </form>
             </div>
-
             <div className="form-card">
                 <h2 className="form-title">Consultar Ordens de Serviço</h2>
                 <form onSubmit={handleSearch} className="search-form">

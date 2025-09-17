@@ -6,13 +6,15 @@ import {
   deletarUsuario,
   login,
 } from "../controllers/usuariosController.js";
+import {isAdmin} from "../middleware/authMiddleware.js"
 
 const router = express.Router();
 
-router.get("/cadastro", listarUsuarios);
-router.post("/cadastro", cadastrarUsuario);
-router.put("/cadastro/:id", atualizarUsuario);
-router.delete("/cadastro/:id", deletarUsuario);
 router.post("/login", login)
+
+router.get("/cadastro", isAdmin, listarUsuarios);
+router.post("/cadastro", isAdmin,cadastrarUsuario);
+router.put("/cadastro/:id", isAdmin,atualizarUsuario);
+router.delete("/cadastro/:id", isAdmin,deletarUsuario);
 
 export default router;

@@ -1,8 +1,13 @@
 .paginacao
 {
-width: inherit;
-height: inherit;
+width: 100%;
+height: 45px;
+padding: 0.75rem 0;
+border-radius: 8px;
+display: flex;
 position: relative;
+align-items: center;
+justify-content: center;
 font-size: 15px;
 font-family: 'Poppins', sans-serif;
 text-decoration: none;
@@ -12,14 +17,21 @@ background-color: none;
 background: none;
 border: none;
 cursor: pointer;
+transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
-.paginacao:hover{
-transition: ease-in-out 0.5s;
-color: #00bcd4;
-position: inherit;
-width: inherit;
-height: inherit;
+.paginacao:hover {
+  color: #00bcd4;
+  background-color: #f4f4f4; 
+}
+
+.paginacao.active {
+  color: #00bcd4;
+  background-color: #e3f8fb;
+}
+
+.paginacao.active:hover {
+    color: #00bcd4;
 }
 
 .menubotao {
@@ -50,8 +62,9 @@ height: inherit;
     display: flex;
     align-items: center;
     left: 0;
-    top: 70px;
-    height: 100%;
+    top: var(--topbar-height);
+    height: calc(100% - var(--topbar-height));
+    width: var(--sidebar-width);
     background: #ffffff;
     color: #fff;
     flex-direction: column;
@@ -70,9 +83,9 @@ height: inherit;
     display: flex;
     flex-direction: column;
     left: 0;
-    top: 70px;
-    width: 160px;
-    height: 100%;
+    top: var(--topbar-height);
+    width: var(--sidebar-width);
+    height: calc(100% - var(--topbar-height) );
     z-index: 10;
     transform: translateX(0);
     opacity: 1;
@@ -85,32 +98,22 @@ height: inherit;
 }
 
 .sidebar ul {
-    width: 160px;
+    width: 100%;
     height: auto;
     display: flex;
     flex-direction: column;
     position: relative;
     list-style: none;
-    padding: 0;
-    margin: 0;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    list-style: none;
     margin-top: 10rem;
     padding-top: 1rem;
     visibility: visible; 
+    gap: 0.5rem;
 }
 
 .listarotas {
     width: 100%;
-    height: 3rem;
-    margin: 1rem;
-    text-align: center;
-    font-family: 'Poppins', sans-serif;
-    cursor: pointer;
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    align-self: center;
-    align-items: center;
-    align-content: center;
-    white-space: nowrap;
-    transition: all 0.7s ease-in-out; 
+
 }

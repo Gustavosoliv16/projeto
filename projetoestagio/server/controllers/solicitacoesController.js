@@ -164,3 +164,42 @@ export function deletarSolicitacao(req, res) {
     });
   });
 }
+
+export function responderSolicitacao(req,res){
+
+  const idSolicitacao = parseInt(req.params.id);
+  const {solucao } = req.body;
+
+  if (!solucao || solucao.trim() === "") {
+    return res.status(400).json({ error: "O campo de solucao e obrigatorio"});
+  }
+db.get((err,conn)=> {
+  if(err) return res.status(500).json({error: err.message});
+
+ const sql = ` UPDATE SOLICITACOES
+ SET  
+    STATUS = ?,
+    DEFEITO_ENCONTRADO = ?,
+    DATA_CONCLUSAO = ?
+  WHERE ID_SOLICITACAO = ?`;
+
+  const params = [
+    "FECHADA",
+    solucao,
+    new Date(),
+    idSolicitacao
+  ];
+
+  conn.query(sql, params, (err2) => {
+      conn.detach();
+      if (err2) {
+        console.error("Erro ao responder solicitação:", err2);
+        return res.status(500).json({ error: err2.message });
+      }
+
+      res.status(200).json({
+        message: `Solicitação ${idSolicitacao} foi respondida e fechada com sucesso.`,
+      });
+    });
+  });
+}

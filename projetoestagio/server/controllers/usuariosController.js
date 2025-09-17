@@ -69,9 +69,14 @@ export function login (req, res){
                     return res.status(401).json({ error: "credenciais invalidas" });
                 }
 
-                const payload = { id: usuario.ID_USUARIOS, nome: usuario.NOME_USUARIO };
+                const payload = { 
+                  id: usuario.ID_USUARIOS, 
+                    nome: usuario.NOME_USUARIO,
+                    email: usuario.EMAIL,
+                    tipo_usuario: usuario.TIPO_USUARIO 
+                };
                 const secret = "uma-chave-secreta-bem-forte-para-testes";
-                const token = jwt.sign(payload, secret, { expiresIn: '10h' });
+                const token = jwt.sign(payload, secret, { expiresIn: '5h' });
 
                 return res.status(200).json({ message: "login efetuado", token: token });
 

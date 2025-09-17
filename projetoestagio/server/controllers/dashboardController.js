@@ -1,10 +1,17 @@
 import db from "../database.js";
 
 export const getDashboardStats = (req, res) => {
+    const {id: userId, tipo_usuario: userType} = req.user;
+    
     db.get((err, conn) => {
         if (err) {
             console.error("Erro de conexão com o banco de dados:", err);
             return res.status(500).json({ error: "Erro de conexão com o banco de dados" });
+        }
+
+        let userFilterClause = "";
+        if (userType !== 'administrador'){
+            userFilterClause = `WHERE s.ID_USUARIO_SOLICITANTE = ${userId}`;
         }
 
         const results = {};
@@ -35,14 +42,14 @@ export const getDashboardStats = (req, res) => {
 
                     const ultimasSql = `
                         SELECT 
-                            s.ID_SOLICITACAO, s.DESCRICAO, s.STATUS,
-                            u_sol.NOME_USUARIO AS NOME_SOLICITANTE, st.NOME_SETOR
-                        FROM SOLICITACOES s
-                        LEFT JOIN USUARIOS u_sol ON s.ID_USUARIO_SOLICITANTE = u_sol.ID_USUARIOS
-                        LEFT JOIN SETOR st ON u_sol.ID_SETOR = st.ID_SETOR
-                        WHERE s.STATUS = 'ABERTA'
-                        ORDER BY s.ID_SOLICITACAO DESC
-                        ROWS 5`;
+                s.ID_SOLICITACAO, s.DESCRICAO, s.STATUS, s.PATRIMONIO,
+                u_sol.NOME_USUARIO AS NOME_SOLICITANTE, st.NOME_SETOR
+            FROM SOLICITACOES s
+            LEFT JOIN USUARIOS u_sol ON s.ID_USUARIO_SOLICITANTE = u_sol.ID_USUARIOS
+            LEFT JOIN SETOR st ON u_sol.ID_SETOR = st.ID_SETOR
+            ${userFilterClause}  -- A cláusula de filtro é inserida aqui
+            ORDER BY s.ID_SOLICITACAO DESC
+            ROWS 20`;
                     
                     conn.query(ultimasSql, (err4, res4) => {
                         conn.detach();

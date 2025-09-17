@@ -32,7 +32,7 @@ export function listarSetor(req, res) {
   db.get((err, conn) => {
     if (err) return res.status(500).json({ error: err.message });
 
-    conn.query("SELECT * FROM SETOR", (err2, result) => {
+    conn.query("SELECT * FROM SETOR ORDER BY ID_SETOR ASC", (err2, result) => {
       conn.detach();
       if (err2) return res.status(500).json({ error: err2.message });
       res.json(result);

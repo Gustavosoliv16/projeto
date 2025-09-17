@@ -8,7 +8,7 @@ const Topbar = () => {
 
     return (
         <header className="topbar">
-           <Link to="/telainicial" className="topbar-logo">
+           <Link to="/tela-inicial" className="topbar-logo">
                 <img src={logoCaratinga} alt="Brasão de Caratinga" />
                 <span>Controle de Patrimônio</span>
             </Link>
@@ -16,7 +16,12 @@ const Topbar = () => {
            
             {user ? (
                 <div className="user-info">
-                    <span className="user-name"> <img src="user_profile.png" alt="perfil" /> <strong>{user.nome || user.email}</strong></span>
+                    <Link to="/meu-perfil" className="profile-link">
+                        <span className="user-name"> 
+                            <img src="user_profile.png" alt="perfil" /> 
+                            <strong>{user.nome}</strong>
+                        </span>
+                    </Link>
                     <button className="logout-button" onClick={logout}>
                         Sair
                     </button>

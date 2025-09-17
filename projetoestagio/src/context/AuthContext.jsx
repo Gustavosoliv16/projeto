@@ -14,31 +14,27 @@ export default function AuthProvider({ children }) {
   };
 
 
-  useEffect(() => {
+ useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
        try {
         const user = jwtDecode(token);
-
        
         if (user.exp * 1000 < Date.now()) {
-         
           console.warn("Token expirado. Fazendo logout automático.");
           logout();
         } else {
           setAuthData({ token, user });
         }
       } catch (e) {
-      
         console.error("Token inválido ou malformado. Fazendo logout.", e);
-        logout(); 
-
-
-        
+        logout();
       }
     }
     setLoading(false);
   }, []);
+
+  
   const login = (token) => {
     const user = jwtDecode(token);
     localStorage.setItem("token", token);
@@ -54,13 +50,12 @@ export default function AuthProvider({ children }) {
     logout
   };
 
-  return (
+   return (
     <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 }
-
 
 export function useAuth() {
   return useContext(AuthContext);

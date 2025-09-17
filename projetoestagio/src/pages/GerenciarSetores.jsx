@@ -15,7 +15,7 @@ const GerenciarSetores = () => {
     const fetchSetores = async () => {
         try {
             const response = await axios.get('/api/setores');
-            setSetores(response.data);
+setSetores(response.data);
         } catch (error) {
             console.error("Erro ao buscar setores:", error);
         }
@@ -26,7 +26,11 @@ const GerenciarSetores = () => {
     }, []);
 
     const handleEdit = (setor) => {
-        setEditingSetor(setor);
+        const entityToEdit= {
+            id: setor.ID_SETOR,
+            name: setor.NOME_SETOR
+        }
+        setEditingSetor(entityToEdit);
         setIsModalOpen(true);
     };
 
@@ -73,11 +77,15 @@ const GerenciarSetores = () => {
         }
     };
 
-    const filtroSetores = useMemo(() => 
-        setores.filter(setor =>
-            (setor.NOME_SETOR || "").toLowerCase().includes(searchTerm.toLowerCase())
-        ), [setores, searchTerm]);
+const filtroSetores = useMemo(() => {
+    const setoresFiltrados = setores.filter(setor =>
+        (setor.NOME_SETOR || "").toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setoresFiltrados.sort((a, b) => a.ID_SETOR - b.ID_SETOR);
 
+    return setoresFiltrados;
+
+}, [setores, searchTerm]); 
     return (
         <>
             <EditMode

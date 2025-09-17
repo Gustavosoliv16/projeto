@@ -38,10 +38,9 @@ const GerenciarEquipamentos = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const novoEquipamento = { nome, modelo, numero_serie: NumPatrimonio, id_setor: idSetor, status: 'Operacional' };
+            const novoEquipamento = { nome, modelo, numero_serie: NumPatrimonio, id_setor: idSetor, status: "vinte" };
             await axios.post('/api/pecas', novoEquipamento);
             
-           
             setNome("");
             setModelo("");
             setNumPatrimonio("");
