@@ -2,7 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from "../context/AuthContext";
+import  {StatusIcon}  from '../components/statusicones.jsx';
 import '../styles/Dashboard.css';
+import '../styles/GerenciarEntidades.css';
+
 
 const Dashboard = () => {
     const { user } = useAuth();
@@ -26,6 +29,16 @@ const Dashboard = () => {
         };
         fetchStats();
     }, []);
+
+    const handleRespostaClick = (e, os) => {
+        e.preventDefault();
+        const detalhes = `
+        
+        Detalhes da Ordem de Serviço:
+        ${os.DEFEITO_ENCONTRADO}
+        `    
+            console.log(detalhes);
+    };
 
    const chamadosFiltrados = useMemo(() => {
         let chamadosParaExibir = [];
@@ -70,8 +83,9 @@ const Dashboard = () => {
                             <th>Nº</th>
                             <th>Solicitante</th>
                             <th>Setor</th>
-                            <th>Status</th>
                             <th>Descrição</th>
+                            <th>Status</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -81,8 +95,9 @@ const Dashboard = () => {
                                         <td>#{index + 1}</td>
                                         <td>{os.NOME_SOLICITANTE || 'N/A'}</td>
                                         <td>{os.NOME_SETOR || 'N/A'}</td>
-                                        <td>{os.STATUS}</td>
                                         <td>{os.DEFEITO_RELATADO || 'N/A'}</td>
+                                        <td><div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><StatusIcon status={os.STATUS} size={20} />{os.STATUS}</div></td>
+                                        <td><button className='btn-primary' onClick={(e) => handleRespostaClick(e,os)}>Resposta</button></td>
                                     </tr>
                                 ))
                             ) : (

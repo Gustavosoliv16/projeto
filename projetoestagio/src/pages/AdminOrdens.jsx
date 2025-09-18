@@ -27,7 +27,7 @@ const ModalResposta = ({os, onClose, onSave}) => {
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2 className="modal-title">Responder Chamado #{os.ID_SOLICITACAO}</h2>
                 <p><b>Solicitante:</b> {os.NOME_SOLICITANTE}</p>
-                <p><b>Descrição do Problema:</b> {os.DESCRICAO}</p>
+                <p><b>Descrição do Problema:</b> {os.DEFEITO_RELATADO}</p>
                 <hr style={{ margin: '1rem 0' }} />
                 <label className="form-label">Solução Aplicada / Defeito Encontrado</label>
                 <textarea

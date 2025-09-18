@@ -51,6 +51,7 @@ export function listarSolicitacoes(req, res) {
         s.STATUS,
         s.DATA_CRIACAO,
         s.DEFEITO_RELATADO,
+        s.DEFEITO_ENCONTRADO,
         u_sol.NOME_USUARIO AS NOME_SOLICITANTE,
         u_resp.NOME_USUARIO AS NOME_RESPONSAVEL,
         st.NOME_SETOR

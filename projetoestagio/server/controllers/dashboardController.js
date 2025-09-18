@@ -1,58 +1,192 @@
 import db from "../database.js";
 
-export const getDashboardStats = (req, res) => {
-    const { id: userId, tipo_usuario: userType } = req.user;
+export function cadastrarSolicitacao(req, res) {
+  const { 
+    ID_USUARIO_SOLICITANTE, 
+    PATRIMONIO,
+    DEFEITO_RELATADO 
+  } = req.body;
 
-    db.get((err, conn) => {
-        if (err) {
-            return res.status(500).json({ error: "Erro de conexão com o banco de dados" });
-        }
+    
+  if (!ID_USUARIO_SOLICITANTE || !DEFEITO_RELATADO) {
+    return res.status(400).json({ error: "O solicitante e a descrição do defeito são obrigatórios." });
+  }
 
-        let whereClause = "WHERE 1=1"; 
-        let params = [];
+  db.get((err, conn) => {
+    if (err) return res.status(500).json({ error: err.message });
 
-        if (userType !== 'administrador') {
-            whereClause += " AND s.ID_USUARIO_SOLICITANTE = ?";
-            params.push(userId);
-        }
+    const sql = `
+      INSERT INTO SOLICITACOES (
+        ID_USUARIO_SOLICITANTE, STATUS, DATA_CRIACAO, PATRIMONIO, DEFEITO_RELATADO
+      ) VALUES (?, ?, ?, ?, ?)
+    `;
 
-        const results = {};
+    const params = [
+      ID_USUARIO_SOLICITANTE,
+      "ABERTA",
+      new Date(),
+      PATRIMONIO || null,
+      DEFEITO_RELATADO
+    ];
 
-        const queryAbertas = `SELECT COUNT(*) AS TOTAL FROM SOLICITACOES s ${whereClause} AND s.STATUS = 'ABERTA'`;
-        const queryFechadas = `SELECT COUNT(*) AS TOTAL FROM SOLICITACOES s ${whereClause} AND s.STATUS = 'FECHADA'`;
-        const queryPendentes = `SELECT COUNT(*) AS TOTAL FROM SOLICITACOES s ${whereClause} AND s.STATUS = 'PENDENTE'`;
-        const queryUltimas = `
-            SELECT 
-                s.ID_SOLICITACAO, S.DEFEITO_RELATADO, s.STATUS, s.PATRIMONIO,
-                u_sol.NOME_USUARIO AS NOME_SOLICITANTE, st.NOME_SETOR
-            FROM SOLICITACOES s
-            LEFT JOIN USUARIOS u_sol ON s.ID_USUARIO_SOLICITANTE = u_sol.ID_USUARIOS
-            LEFT JOIN SETOR st ON u_sol.ID_SETOR = st.ID_SETOR
-            ${whereClause}
-            ORDER BY s.ID_SOLICITACAO DESC
-            ROWS 20`;
-
-        conn.query(queryAbertas, params, (err1, res1) => {
-            if (err1) { conn.detach(); return res.status(500).json({ error: "Erro ao contar chamados abertos: " + err1.message }); }
-            results.ordensAbertas = res1[0].TOTAL;
-
-            conn.query(queryFechadas, params, (err2, res2) => {
-                if (err2) { conn.detach(); return res.status(500).json({ error: "Erro ao contar chamados fechados: " + err2.message }); }
-                results.resolvidos = res2[0].TOTAL; 
-
-                conn.query(queryPendentes, params, (err3, res3) => {
-                    if (err3) { conn.detach(); return res.status(500).json({ error: "Erro ao contar chamados pendentes: " + err3.message }); }
-                    results.pendentes = res3[0].TOTAL;
-
-                    conn.query(queryUltimas, params, (err4, res4) => {
-                        conn.detach();
-                        if (err4) { return res.status(500).json({ error: "Erro ao listar últimos chamados: " + err4.message }); }
-                        results.ultimasSolicitacoes = res4;
-                        
-                        res.json(results);
-                    });
-                });
-            });
-        });
+    conn.query(sql, params, (err2) => {
+      conn.detach();
+      if (err2) {
+        console.error("Erro ao inserir solicitação:", err2);
+        return res.status(500).json({ error: err2.message });
+      }
+      res.status(201).json({
+        message: "Solicitação criada com sucesso!",
+      });
     });
-};
+  });
+}
+
+export function listarSolicitacoes(req, res) {
+  db.get((err, conn) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const sql = `
+      SELECT 
+        s.ID_SOLICITACAO,
+        s.STATUS,
+        s.DATA_CRIACAO,
+        s.DEFEITO_RELATADO,
+        s.DEFEITO_ENCONTRADO,
+        u_sol.NOME_USUARIO AS NOME_SOLICITANTE,
+        u_resp.NOME_USUARIO AS NOME_RESPONSAVEL,
+        st.NOME_SETOR
+      FROM 
+        SOLICITACOES s
+      LEFT JOIN 
+        USUARIOS u_sol ON s.ID_USUARIO_SOLICITANTE = u_sol.ID_USUARIOS
+      LEFT JOIN 
+        USUARIOS u_resp ON s.ID_USUARIO_RESPONSAVEL = u_resp.ID_USUARIOS
+      LEFT JOIN
+        SETOR st ON u_sol.ID_SETOR = st.ID_SETOR
+      ORDER BY
+        s.ID_SOLICITACAO DESC
+    `;
+
+    conn.query(sql, (err2, result) => {
+      conn.detach();
+      if (err2) {
+        console.error("Erro na consulta SQL de solicitações:", err2);
+        return res.status(500).json({ error: err2.message });
+      }
+      res.json(result);
+    });
+  });
+}
+
+
+export function atribuirResponsavel(req, res) {
+  const idSolicitacao = parseInt(req.params.id);
+  const { ID_USUARIO_RESPONSAVEL } = req.body; 
+  if (!ID_USUARIO_RESPONSAVEL) {
+    return res.status(400).json({ error: "ID_USUARIO_RESPONSAVEL é obrigatório" });
+  }
+
+  db.get((err, conn) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const sql = `
+      UPDATE SOLICITACOES
+      SET ID_USUARIO_RESPONSAVEL = ?
+      WHERE ID_SOLICITACAO = ?
+    `;
+
+    conn.query(sql, [ID_USUARIO_RESPONSAVEL, idSolicitacao], (err2) => {
+      conn.detach();
+      if (err2) return res.status(500).json({ error: err2.message });
+
+      res.status(200).json({
+        message: `Solicitação ${idSolicitacao} atribuída ao usuário ${ID_USUARIO_RESPONSAVEL}`,
+      });
+    });
+  });
+}
+
+export function alterarStatus(req, res) {
+  const idSolicitacao = parseInt(req.params.id);
+  const { STATUS } = req.body;
+  if (!STATUS) {
+    return res.status(400).json({ error: "STATUS é obrigatório" });
+  }
+
+  db.get((err, conn) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const sql = `
+      UPDATE SOLICITACOES
+      SET STATUS = ?
+      WHERE ID_SOLICITACAO = ?
+    `;
+
+    conn.query(sql, [STATUS, idSolicitacao], (err2) => {
+      conn.detach();
+      if (err2) return res.status(500).json({ error: err2.message });
+
+      res.status(200).json({
+        message: `Solicitação ${idSolicitacao} teve seu status alterado para ${STATUS}`,
+      });
+    });
+  });
+}
+
+export function deletarSolicitacao(req, res) {
+  const id = parseInt(req.params.id);
+
+  db.get((err, conn) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const sql = "DELETE FROM SOLICITACOES WHERE ID_SOLICITACAO = ?";
+
+    conn.query(sql, [id], (err2) => {
+      conn.detach();
+      if (err2) return res.status(500).json({ error: err2.message });
+
+      res.status(200).json({
+        message: `Solicitação com ID ${id} deletada com sucesso.`,
+      });
+    });
+  });
+}
+
+export function responderSolicitacao(req,res){
+  const idSolicitacao = parseInt(req.params.id);
+  const { solucao } = req.body;
+
+  if (!solucao || solucao.trim() === "") {
+    return res.status(400).json({ error: "O campo de solucao e obrigatorio"});
+  }
+  db.get((err,conn)=> {
+    if(err) return res.status(500).json({error: err.message});
+
+    const sql = ` UPDATE SOLICITACOES
+      SET 
+        STATUS = ?,
+        DEFEITO_ENCONTRADO = ?,
+        DATA_CONCLUSAO = ?
+      WHERE ID_SOLICITACAO = ?`;
+
+    const params = [
+      "FECHADA",
+      solucao,
+      new Date(),
+      idSolicitacao
+    ];
+
+    conn.query(sql, params, (err2) => {
+        conn.detach();
+        if (err2) {
+          console.error("Erro ao responder solicitação:", err2);
+          return res.status(500).json({ error: err2.message });
+        }
+
+        res.status(200).json({
+          message: `Solicitação ${idSolicitacao} foi respondida e fechada com sucesso.`,
+        });
+      });
+  });
+}
