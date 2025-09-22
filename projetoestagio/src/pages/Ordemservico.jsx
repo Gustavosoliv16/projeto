@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { StatusIcon } from '../components/statusicones.jsx'; 
 import "../styles/GerenciarOrdens.css";
+import "../styles/Mode.css";
 
 const formatarData = (dataValor) => {
     if (!dataValor) return 'N/A';
@@ -11,23 +13,102 @@ const formatarData = (dataValor) => {
         day: '2-digit', month: '2-digit', year: 'numeric'
     });
 };
+const ModalDetalhes = ({ os, onClose }) => {
+    if (!os) return null;
+
+    const formatDate = (dateString) => {
+    try {
+        return new Date(dateString).toLocaleDateString('pt-BR', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+    } catch (e) { 
+        return 'Data inválida',e;
+    }
+};
+
+    const statusClass = os.STATUS ? os.STATUS.toLowerCase().trim() : '';
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content modal-details" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                    <h2 className="modal-title">Detalhes do Chamado #{os.ID_SOLICITACAO}</h2>
+                    <span className={`status-badge ${statusClass}`}>
+                        <StatusIcon status={os.STATUS} size={16} />
+                        {os.STATUS}
+                    </span>
+                </div>
+                <div className="modal-body">
+                    <div className="details-grid">
+                        <div className="detail-item">
+                            <strong>Solicitante:</strong>
+                            <span>{os.NOME_SOLICITANTE || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                            <strong>Setor:</strong>
+                            <span>{os.NOME_SETOR || 'N/A'}</span>
+                        </div>
+                        <div className="detail-item">
+                            <strong>Data de Criação:</strong>
+                            <span>{formatDate(os.DATA_CRIACAO)}</span>
+                        </div>
+                    </div>
+                    <div className="content-section">
+                        <p><strong>Problema Relatado:</strong></p>
+                        <div className="content-box">
+                            {os.DEFEITO_RELATADO || 'Nenhuma descrição fornecida.'}
+                        </div>
+                    </div>
+                    {os.STATUS === 'FECHADA' && (
+                        <div className="content-section">
+                            <p><strong>Solução Aplicada:</strong></p>
+                            <div className="content-box solution-box">
+                                {os.DEFEITO_ENCONTRADO || 'Nenhuma solução registrada.'}
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <div className="modal-actions">
+                    <button onClick={onClose} className="btn-primary">Fechar</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
 const GerenciarOrdensServico = () => {
     const { user } = useAuth();
     
     const [patrimonio, setPatrimonio] = useState(""); 
     const [defeito, setDefeito] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
 
-    const [resultados, setResultados] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [pesquisaRealizada, setPesquisaRealizada] = useState(false);
+    const [todasOrdens, setTodasOrdens] = useState([]); 
+    const [loading, setLoading] = useState(true);
+
+    const [chamadoSelecionado, setChamadoSelecionado] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const fetchOrdens = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`/api/solicitacoes`); 
+            setTodasOrdens(response.data || []);
+        } catch (error) {
+            console.error("Erro ao buscar ordens de serviço:", error);
+            setTodasOrdens([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
+        fetchOrdens(); 
     }, []);
 
     const handleCadastroSubmit = async (e) => {
         e.preventDefault();
-
         if (!user || !user.id) {
             alert("Erro: Utilizador não autenticado.");
             return;
@@ -38,145 +119,118 @@ const GerenciarOrdensServico = () => {
                 PATRIMONIO: patrimonio,
                 DEFEITO_RELATADO: defeito
             };
-
             await axios.post("/api/solicitacoes", novaOrdem);
             alert("Ordem de Serviço criada com sucesso!");
             setPatrimonio("");
             setDefeito("");
-
-            if (pesquisaRealizada) {
-                handleSearch({ preventDefault: () => {}, target: { elements: { inputsearch: { value: '' } } } });
-            }
+            fetchOrdens(); 
         } catch (error) {
             console.error("Erro ao cadastrar Ordem de Serviço:", error);
             alert(error.response?.data?.error || "Erro ao criar Ordem de Serviço.");
         }
     };
-
-    const handleSearch = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setPesquisaRealizada(true);
-        const searchValue = e.target.elements.inputsearch.value.toLowerCase();
-        try {
-            const response = await axios.get(`/api/solicitacoes`); 
-            const filtrados = response.data.filter(os =>
-                (os.NOME_SOLICITANTE || '').toLowerCase().includes(searchValue) ||
-                (os.STATUS || '').toLowerCase().includes(searchValue) ||
-                (os.NOME_SETOR || '').toLowerCase().includes(searchValue)            
-            );
-            const ordenados = filtrados.sort((a, b) => a.ID_SOLICITACAO - b.ID_SOLICITACAO);
-            setResultados(ordenados || []);
-        } catch (error) {
-            console.error("Erro ao buscar ordens de serviço:", error);
-            setResultados([]);
-        } finally {
-            setLoading(false);
+    
+    const resultadosFiltrados = useMemo(() => {
+        if (!searchTerm) {
+            return todasOrdens.sort((a, b) => b.ID_SOLICITACAO - a.ID_SOLICITACAO);
         }
+        const termo = searchTerm.toLowerCase();
+        return todasOrdens.filter(os =>
+            (os.NOME_SOLICITANTE || '').toLowerCase().includes(termo) ||
+            (os.STATUS || '').toLowerCase().includes(termo) ||
+            (os.NOME_SETOR || '').toLowerCase().includes(termo) ||
+            (String(os.ID_SOLICITACAO) || '').includes(termo)
+        ).sort((a, b) => b.ID_SOLICITACAO - a.ID_SOLICITACAO);
+    }, [searchTerm, todasOrdens]);
+
+    const handleDetalhesClick = (os) => {
+        setChamadoSelecionado(os);
+        setIsModalVisible(true);
     };
 
-    const handleDetalhes = (e, os) => {
-        e.preventDefault();
-        const detalhes = `
-            Detalhes do Chamado #${os.ID_SOLICITACAO}:
-            ---------------------------------
-            Solicitante: ${os.NOME_SOLICITANTE || 'N/A'}
-            Responsável: ${os.NOME_RESPONSAVEL || 'Não atribuído'}
-            Setor: ${os.NOME_SETOR || 'N/A'}
-            Status: ${os.STATUS}
-            Data: ${formatarData(os.DATA_CRIACAO)}
-            ---------------------------------
-            Descrição: ${os.DEFEITO_RELATADO || 'N/A'}`;
-            console.log(detalhes);
+    const handleCloseModal = () => {
+        setIsModalVisible(false);
+        setChamadoSelecionado(null);
     };
 
     return (
-        <main className="ordens-container">
-            
-            <div className="form-card">
-                <h2 className="form-title">Abrir Nova Ordem de Serviço</h2>
-                <form onSubmit={handleCadastroSubmit} className="form-grid">
-                   <div className="full-width">
-                        <label className="form-label">Solicitante</label>
-                        <input type="text" className="form-input" value={user ? user.nome : "Carregando..."} disabled />
-                    </div>
+        <>
+            {isModalVisible && <ModalDetalhes os={chamadoSelecionado} onClose={handleCloseModal} />}
+            <main className="ordens-container">
+                <div className="form-card">
+                    <h2 className="form-title">Abrir Nova Ordem de Serviço</h2>
+                    <form onSubmit={handleCadastroSubmit} className="form-grid">
+                       <div className="full-width">
+                            <label className="form-label">Solicitante</label>
+                            <input type="text" className="form-input" value={user ? user.nome : "Carregando..."} disabled />
+                        </div>
+                        <div>
+                            <label htmlFor="patrimonio" className="form-label">Nº do Patrimônio (Opcional)</label>
+                            <input id="patrimonio" className="form-input" placeholder="Digite o número do patrimônio" value={patrimonio} onChange={(e) => setPatrimonio(e.target.value)} />
+                        </div>
+                        <div className="full-width">
+                            <label htmlFor="descricao" className="form-label">Descrição do Problema</label>
+                            <textarea id="descricao" placeholder="Descreva o problema detalhadamente..." className="form-textarea" value={defeito} onChange={(e) => setDefeito(e.target.value)} required />
+                        </div>
+                        <div className="full-width mt-4">
+                            <button type="submit" className="btn-primary">Abrir Chamado</button>
+                        </div>
+                    </form>
+                </div>
 
-
-                    <div>
-                        <label htmlFor="patrimonio" className="form-label">Nº do Patrimônio </label>
-                        <input 
-                            id="patrimonio" 
-                            className="form-input" 
-                            placeholder="Digite o número do patrimônio" 
-                            value={patrimonio} 
-                            onChange={(e) => setPatrimonio(e.target.value)} 
+                <div className="results-card">
+                    <div className="results-header">
+                        <h3 className="card-title">Ordens de Serviço</h3>
+                        <input
+                            type="text"
+                            placeholder="Pesquisar por nº, solicitante, setor ou status..."
+                            className="form-input search-input"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    
-                    <div className="full-width">
-                        <label htmlFor="descricao" className="form-label">Descrição do Problema</label>
-                        <textarea id="descricao" placeholder="Descreva o problema..." className="form-textarea" value={defeito} onChange={(e) => setDefeito(e.target.value)} required />
-                    </div>
-
-                    <div className="full-width mt-4">
-                        <button type="submit" className="btn-primary">
-                            Abrir Chamado
-                        </button>
-                    </div>
-                </form>
-            </div>
-            <div className="form-card">
-                <h2 className="form-title">Consultar Ordens de Serviço</h2>
-                <form onSubmit={handleSearch} className="search-form">
-                    <input id="inputsearch" name="inputsearch" type="text" placeholder="Pesquisar..." className="form-input search-input" />
-                    <button id="search-button" type="submit" className="btn-primary btn-search">
-                        Pesquisar
-                    </button>
-                </form>
-            </div>
-
-            {pesquisaRealizada && (
-                <div className="results-card">
-                    <h3 className="results-title">Resultados da Pesquisa</h3>
-                    {loading ? (
-                        <div className="loading">Buscando...</div>
-                    ) : resultados.length > 0 ? (
-                        <table className="results-table">
-                            <thead>
-                                <tr>
-                                    <th>Nº</th>
-                                    <th>Solicitante</th>
-                                    <th>Responsável</th>
-                                    <th>Setor</th>
-                                    <th>Data</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                           
-                            <tbody>
-                                {resultados.map((os, index) => (
-                                    <tr key={os.ID_SOLICITACAO}>
-                                        <td>#{index + 1}</td>
-                                        <td>{os.NOME_SERVICO || 'Não especificado'}</td>
-                                        <td>{os.NOME_SOLICITANTE || 'Usuário não encontrado'}</td>
-                                        <td>{os.NOME_RESPONSAVEL || 'Não atribuído'}</td>
-                                        <td>{os.NOME_SETOR || 'Não informado'}</td>
-                                        <td>{formatarData(os.DATA_CRIACAO)}</td>
-                                        <td>{os.STATUS}</td>
-                                        <td>
-                                            <button onClick={(e) => handleDetalhes(e, os)} className="btn-secondary">Detalhes</button>
-                                        </td>
+                    {loading ? <div className="loading">Buscando...</div> : (
+                        <div className="table-wrapper">
+                            <table className="results-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nº</th>
+                                        <th>Solicitante</th>
+                                        <th>Setor</th>
+                                        <th>Status</th>
+                                        <th>Data</th>
+                                        <th>Ações</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    ) : (
-                        <div className="no-results">Nenhuma ordem de serviço encontrada.</div>
+                                </thead>
+                                <tbody>
+                                    {resultadosFiltrados.length > 0 ? (
+                                        resultadosFiltrados.map((os) => (
+                                            <tr key={os.ID_SOLICITACAO}>
+                                                <td>#{os.ID_SOLICITACAO}</td>
+                                                <td>{os.NOME_SOLICITANTE || 'N/A'}</td>
+                                                <td>{os.NOME_SETOR || 'N/A'}</td>
+                                                <td>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <StatusIcon status={os.STATUS} size={20} />
+                                                        {os.STATUS}
+                                                    </div>
+                                                </td>
+                                                <td>{formatarData(os.DATA_CRIACAO)}</td>
+                                                <td>
+                                                    <button onClick={() => handleDetalhesClick(os)} className="btn-secondary">Detalhes</button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr><td colSpan="6" style={{ textAlign: 'center' }}>Nenhuma ordem de serviço encontrada.</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                 </div>
-            )}
-        </main>
+            </main>
+        </>
     );
 };
 

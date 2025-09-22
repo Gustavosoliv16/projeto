@@ -42,32 +42,37 @@ export function cadastrarSolicitacao(req, res) {
 }
 
 export function listarSolicitacoes(req, res) {
+  
+  if (!req.user || typeof req.user.id === 'undefined' || !req.user.tipo_usuario) {
+
+    return res.status(401).json({ error: "Informações de autenticação inválidas ou ausentes no token. Por favor, faça login novamente." });
+  }
+
+  const { id, tipo_usuario } = req.user;
+
   db.get((err, conn) => {
     if (err) return res.status(500).json({ error: err.message });
 
-    const sql = `
+    let sql = `
       SELECT 
-        s.ID_SOLICITACAO,
-        s.STATUS,
-        s.DATA_CRIACAO,
-        s.DEFEITO_RELATADO,
-        s.DEFEITO_ENCONTRADO,
-        u_sol.NOME_USUARIO AS NOME_SOLICITANTE,
-        u_resp.NOME_USUARIO AS NOME_RESPONSAVEL,
-        st.NOME_SETOR
-      FROM 
-        SOLICITACOES s
-      LEFT JOIN 
-        USUARIOS u_sol ON s.ID_USUARIO_SOLICITANTE = u_sol.ID_USUARIOS
-      LEFT JOIN 
-        USUARIOS u_resp ON s.ID_USUARIO_RESPONSAVEL = u_resp.ID_USUARIOS
-      LEFT JOIN
-        SETOR st ON u_sol.ID_SETOR = st.ID_SETOR
-      ORDER BY
-        s.ID_SOLICITACAO DESC
+        s.ID_SOLICITACAO, s.STATUS, s.DATA_CRIACAO, s.DEFEITO_RELATADO,
+        s.DEFEITO_ENCONTRADO, u_sol.NOME_USUARIO AS NOME_SOLICITANTE,
+        u_resp.NOME_USUARIO AS NOME_RESPONSAVEL, st.NOME_SETOR
+      FROM SOLICITACOES s
+      LEFT JOIN USUARIOS u_sol ON s.ID_USUARIO_SOLICITANTE = u_sol.ID_USUARIOS
+      LEFT JOIN USUARIOS u_resp ON s.ID_USUARIO_RESPONSAVEL = u_resp.ID_USUARIOS
+      LEFT JOIN SETOR st ON u_sol.ID_SETOR = st.ID_SETOR
     `;
+    const params = [];
 
-    conn.query(sql, (err2, result) => {
+    if (tipo_usuario !== 'administrador') {
+      sql += ' WHERE s.ID_USUARIO_SOLICITANTE = ?';
+      params.push(id);
+    }
+
+    sql += ' ORDER BY s.ID_SOLICITACAO DESC';
+
+    conn.query(sql, params, (err2, result) => {
       conn.detach();
       if (err2) {
         console.error("Erro na consulta SQL de solicitações:", err2);
@@ -187,4 +192,45 @@ export function responderSolicitacao(req,res){
         });
       });
   });
+}
+
+export function buscarSolicitacaoPorId(req, res) {
+  const id = parseInt(req.params.id);
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: "ID da solicitação inválido." });
+  }
+
+  db.get((err, conn) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const sql = `
+      SELECT 
+        s.ID_SOLICITACAO,
+        s.STATUS,
+        s.DATA_CRIACAO,
+        s.DEFEITO_RELATADO,
+        s.DEFEITO_ENCONTRADO,
+        u_sol.NOME_USUARIO AS NOME_SOLICITANTE,
+        st.NOME_SETOR
+      FROM 
+        SOLICITACOES s
+      LEFT JOIN 
+        USUARIOS u_sol ON s.ID_USUARIO_SOLICITANTE = u_sol.ID_USUARIOS
+      LEFT JOIN
+        SETOR st ON u_sol.ID_SETOR = st.ID_SETOR
+      WHERE s.ID_SOLICITACAO = ?
+    `;
+
+    conn.query(sql, [id], (err2, result) => {
+      conn.detach();
+      if (err2) {
+        return res.status(500).json({ error: err2.message });
+      }
+      if (result.length === 0) {
+        return res.status(404).json({ message: "Solicitação não encontrada." });
+      }
+      res.json(result[0]);
+  });
+});
 }

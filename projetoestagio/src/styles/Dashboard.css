@@ -114,3 +114,84 @@
 .card:not(.card-action){
     cursor: pointer;
 }
+
+.modal-details .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.modal-header .modal-title {
+    margin: 0;
+}
+
+.modal-details .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-item strong {
+    color: #555;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.content-section p {
+    margin: 0 0 0.5rem 0;
+}
+
+.content-box {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.solution-box {
+    background-color: #e8f5e9; 
+    border-color: #c8e6c9;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    text-transform: uppercase;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.status-badge.aberta {
+    background-color: #5a86e6; 
+}
+
+.status-badge.fechada {
+    background-color: #28a745; 
+}
+
+
+.status-badge.pendente {
+    background-color: #ffc107;
+}

@@ -6,7 +6,7 @@ export const StatusIcon = ({ status, size = 20 }) => {
     if (statusLower.includes('aberta') || statusLower.includes('novo') || statusLower.includes('em andamento')) {
       return 'aberta';
     }
-    if (statusLower.includes('resolvido') || statusLower.includes('concluido') || statusLower.includes('finalizado')) {
+    if (statusLower.includes('fechada') || statusLower.includes('concluido') || statusLower.includes('finalizado')) {
       return 'resolvido';
     }
     if (statusLower.includes('pendente') || statusLower.includes('andamento') || statusLower.includes('aberto')) {
@@ -25,7 +25,7 @@ export const StatusIcon = ({ status, size = 20 }) => {
         case 'aberta':
         return (
           <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" fill="#3b82f6"/>
+            <circle cx="12" cy="12" r="10" fill="#1462e0ff"/>
             <path d="M12 6v6l4 2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         );
