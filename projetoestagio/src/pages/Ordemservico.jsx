@@ -131,11 +131,16 @@ const GerenciarOrdensServico = () => {
     };
     
     const resultadosFiltrados = useMemo(() => {
+
+        const ordensOrdenaadasParaContagem = [...todasOrdens].sort((a,b) => new Date(a.DATA_CRIACAO) - new Date(b.DATA_CRIACAO));
+        
+        const ordensComOrdem = ordensOrdenaadasParaContagem.map((os, index) => ({ ...os, ordem: index + 1 }));
+
         if (!searchTerm) {
-            return todasOrdens.sort((a, b) => b.ID_SOLICITACAO - a.ID_SOLICITACAO);
+            return ordensComOrdem.sort((a, b) => a.ID_SOLICITACAO - b.ID_SOLICITACAO);
         }
         const termo = searchTerm.toLowerCase();
-        return todasOrdens.filter(os =>
+        return ordensComOrdem.filter(os =>
             (os.NOME_SOLICITANTE || '').toLowerCase().includes(termo) ||
             (os.STATUS || '').toLowerCase().includes(termo) ||
             (os.NOME_SETOR || '').toLowerCase().includes(termo) ||
@@ -206,7 +211,7 @@ const GerenciarOrdensServico = () => {
                                     {resultadosFiltrados.length > 0 ? (
                                         resultadosFiltrados.map((os) => (
                                             <tr key={os.ID_SOLICITACAO}>
-                                                <td>#{os.ID_SOLICITACAO}</td>
+                                                <td>#{user && user.tipo_usuario === 'administrador' ? os.ID_SOLICITACAO : os.ordem}</td>
                                                 <td>{os.NOME_SOLICITANTE || 'N/A'}</td>
                                                 <td>{os.NOME_SETOR || 'N/A'}</td>
                                                 <td>

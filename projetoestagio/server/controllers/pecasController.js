@@ -6,7 +6,7 @@ export const cadastrarPeca = (req, res) => {
   db.get((err, conn) => {
     if (err) return res.status(500).json({ error: err.message });
 
-    // 1. Inserir na tabela PECAS
+
     conn.query(
       `INSERT INTO PECAS (NOME, DESCRICAO, MODELO, MARCA, FORNECEDOR, PATRIMONIO) 
        VALUES (?, ?, ?, ?, ?, ?) RETURNING ID_PECA`,
@@ -17,10 +17,8 @@ export const cadastrarPeca = (req, res) => {
           return res.status(500).json({ error: err2.message });
         }
 
-        // Firebird retorna objeto com colunas
         const idPeca = result.ID_PECA;
 
-        // 2. Verifica se já existe no estoque
         conn.query(
           "SELECT ID_PECA, QUANTIDADE FROM ESTOQUE_PECAS WHERE ID_PECA = ?",
           [idPeca],
@@ -31,7 +29,6 @@ export const cadastrarPeca = (req, res) => {
             }
 
             if (estoqueResult.length > 0) {
-              // 3a. Já existe no estoque → incrementa
               conn.query(
                 "UPDATE ESTOQUE_PECAS SET QUANTIDADE = QUANTIDADE + 1 WHERE ID_PECA = ?",
                 [idPeca],
@@ -56,7 +53,6 @@ export const cadastrarPeca = (req, res) => {
                 }
               );
             } else {
-              // 3b. Não existe no estoque → cria com quantidade 1
               conn.query(
                 "INSERT INTO ESTOQUE_PECAS (ID_PECA, QUANTIDADE) VALUES (?, ?)",
                 [idPeca, 1],
@@ -154,14 +150,40 @@ export function deletarPeca(req, res) {
   db.get((err, conn) => {
     if (err) return res.status(500).json({ error: err.message });
 
-    const sql = "DELETE FROM PECAS WHERE ID_PECA = ?";
+  conn.transaction(db.ISOLATION_READ_COMMITTED, (err, tx) => {
+      if (err) {
+        conn.detach();
+        return res.status(500).json({ error: "Erro ao iniciar a transação: " + err.message });
+      }
 
-    conn.query(sql, [id], (err2) => {
-      conn.detach();
-      if (err2) return res.status(500).json({ error: err2.message });
 
-      res.status(200).json({
-        message: `Peça com ID ${id} deletada com sucesso.`,
+      tx.query("DELETE FROM ESTOQUE_PECAS WHERE ID_PECA = ?", [id], (errEstoque) => {
+        if (errEstoque) {
+          return tx.rollback(() => {
+            conn.detach();
+            console.error("Erro ao apagar do estoque:", errEstoque);
+            return res.status(500).json({ error: "Erro ao apagar registo do estoque." });
+          });
+        }
+        tx.query("DELETE FROM PECAS WHERE ID_PECA = ?", [id], (errPeca) => {
+          if (errPeca) {
+            return tx.rollback(() => {
+              conn.detach();
+              console.error("Erro ao apagar a peça:", errPeca);
+              return res.status(500).json({ error: "Erro ao apagar a peça principal." });
+            });
+          }
+
+          tx.commit((errCommit) => {
+            conn.detach();
+            if (errCommit) {
+              return res.status(500).json({ error: "Erro ao confirmar a transação." });
+            }
+            res.status(200).json({
+              message: `Peça com ID ${id} e o seu registo de stock foram apagados com sucesso.`,
+            });
+          });
+        });
       });
     });
   });

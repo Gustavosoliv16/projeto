@@ -247,3 +247,62 @@
   cursor: pointer;
   transition: all 0.3s ease;
 }
+
+/* --- NOVO LAYOUT 2x2 PARA BOTÕES DE AÇÕES --- */
+
+.actions-grid-container {
+  display: grid;
+  /* Coluna da esquerda (2fr) é duas vezes maior que a da direita (1fr) */
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 4px; /* Espaçamento entre os botões */
+  min-width: 180px; /* Garante que o grid não fique muito apertado */
+}
+
+/* Estilo base para todos os botões dentro do grid */
+.actions-grid-container .btn-grid {
+  padding: 8px 5px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.actions-grid-container .btn-grid:hover {
+  opacity: 0.85;
+}
+
+/* --- Cores e posicionamento de cada botão --- */
+
+/* Botão Azul (Visualizar) - Topo, Esquerda */
+.btn-visualizar {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  background-color: #007bff; /* Azul */
+}
+
+/* Botão Amarelo (Editar) - Topo, Direita */
+.btn-editar {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  background-color: #ffc107; /* Amarelo */
+  color: #212529; /* Texto escuro para contraste */
+}
+
+/* Botão Preto (Ver Detalhes) - Baixo, Esquerda */
+.btn-detalhes {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+  background-color: #343a40; /* Preto/Cinza Escuro */
+}
+
+/* Botão Vermelho (Excluir) - Baixo, Direita */
+.btn-excluir {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  background-color: #dc3545; /* Vermelho */
+}

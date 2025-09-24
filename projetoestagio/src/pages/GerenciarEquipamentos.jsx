@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
-import "../styles/GerenciarEntidades.css"; 
+import  {StatusIcon}  from '../components/statusicones.jsx';
+import "../styles/GerenciarUsuarios.css";
+import "../styles/GerenciarEntidades.css";
 
 const GerenciarEquipamentos = () => {
 
@@ -30,6 +31,31 @@ const GerenciarEquipamentos = () => {
             setLoading(false);
         }
     };
+
+    const handleEdit = async (id, novoNome) => {
+        try {
+            await axios.put(`/api/setores/${id}`, { NOME_SETOR: novoNome });
+            fetchData();
+            alert("Setor atualizado com sucesso!");
+        } catch (error) {
+            console.error("Erro ao atualizar setor:", error);
+            alert("Erro ao atualizar setor.");
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm("Tem certeza que deseja apagar este registro?")) {
+            try {
+                await axios.delete(`/api/pecas/${id}`);
+                fetchData();
+                alert("Registro de equipamento excluído com sucesso!");
+            } catch (error) {
+                console.error("Erro ao excluir equipamento:", error);
+                alert("Erro ao excluir equipamento.");
+            }
+        }
+    };
+
 
     useEffect(() => {
         fetchData();
@@ -76,7 +102,7 @@ const GerenciarEquipamentos = () => {
                         <label className="form-label">SETOR</label>
                         <select className="form-input" value={idSetor} onChange={(e) => setIdSetor(e.target.value)} required>
                             <option value="">Selecione o setor</option>
-                            {setores.map(setor => <option key={setor.ID_SETOR} value={setor.ID_SETOR}>{setor.NOME_SETOR}</option>)}
+                            {setores.map(os => <option key={os.ID_SETOR} value={os.ID_SETOR}>{os.NOME_SETOR}</option>)}
                         </select>
                     </div>
                     
@@ -102,14 +128,21 @@ const GerenciarEquipamentos = () => {
                         </thead>
                         <tbody>
                             {equipamentos.map((eq) => (
-                                <tr key={eq.id}>
-                                    <td>{eq.nome}</td>
-                                    <td>{eq.modelo}</td>
-                                    <td>{eq.numero_serie}</td>
-                                    <td>{eq.setor?.nome || 'N/A'}</td>
-                                    <td>{eq.status}</td>
-                                    <td>
-                                        <button className="btn-secondary">Editar</button>
+                                <tr key={eq.ID_PECA}>
+                                    <td>{eq.NOME}</td>
+                                    <td>{eq.MODELO}</td>
+                                    <td>{eq.PATRIMONIO}</td>
+                                    <td>{eq.NOME_SETOR || 'N/A'}</td>
+                                    <td><StatusIcon status={eq.STATUS} /></td>
+                                    <td className="actions-cell">
+                                        <div className="actions-grid-container">
+                                           
+                                            <button className="btn-grid btn-visualizar">Visualizar</button>
+                                            <button onClick={() => handleEdit(eq)} className="btn-grid btn-editar">Editar</button>
+                                            
+                                            <button onClick={() => handleEdit(eq)} className="btn-grid btn-detalhes">Ver Detalhes</button>
+                                            <button onClick={() => handleDelete(eq.ID_PECA)} className="btn-grid btn-excluir">Excluir</button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -122,3 +155,5 @@ const GerenciarEquipamentos = () => {
 }
 
 export default GerenciarEquipamentos;
+
+ 

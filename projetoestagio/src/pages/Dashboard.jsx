@@ -125,15 +125,21 @@ const Dashboard = () => {
         setChamadoSelecionado(null);
     };
 
-
    const chamadosFiltrados = useMemo(() => {
         let chamadosParaExibir = [];
 
+        const ordenadosParaContagem = [...stats.ultimasSolicitacoes].sort((a, b) =>
+            new Date(a.DATA_CRIACAO) - new Date(b.DATA_CRIACAO)
+        );
+        const comOrdem = ordenadosParaContagem.map((os, index) =>({...os, ordem: index + 1}));
+
+        chamadosParaExibir = comOrdem;
+
         if (filtroStatus === 'TODOS') {
-            chamadosParaExibir = stats.ultimasSolicitacoes;
+            chamadosParaExibir = comOrdem;
         } else {
             const statusAlvo = filtroStatus === 'RESOLVIDO' ? 'FECHADA' : filtroStatus;
-            chamadosParaExibir = stats.ultimasSolicitacoes.filter(os => os.STATUS === statusAlvo);
+            chamadosParaExibir = comOrdem.filter(os => os.STATUS === statusAlvo);
         }
         return chamadosParaExibir.sort((a,b) => a.ID_SOLICITACAO - b.ID_SOLICITACAO);
     }, [stats.ultimasSolicitacoes, filtroStatus]);
@@ -181,7 +187,7 @@ const Dashboard = () => {
                             {chamadosFiltrados.length > 0 ? (
                                 chamadosFiltrados.map((os) => (
                                     <tr key={os.ID_SOLICITACAO}>
-                                        <td>#{os.ID_SOLICITACAO}</td>
+                                        <td>#{user && user.tipo_usuario === 'administrador' ? os.ID_SOLICITACAO : os.ordem}</td>
                                         <td>{os.NOME_SOLICITANTE || 'N/A'}</td>
                                         <td>{os.NOME_SETOR || 'N/A'}</td>
                                         <td>

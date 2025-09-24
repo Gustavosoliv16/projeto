@@ -166,7 +166,7 @@ export function responderSolicitacao(req,res){
   db.get((err,conn)=> {
     if(err) return res.status(500).json({error: err.message});
 
-    const sql = ` UPDATE SOLICITACOES
+     const sql = ` UPDATE SOLICITACOES
       SET 
         STATUS = ?,
         DEFEITO_ENCONTRADO = ?,
