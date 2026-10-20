@@ -14,10 +14,21 @@ dist-ssr
 server/data/*.sqlite
 server/data/*.sqlite-*
 
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Test reports
+coverage/
+
+# Operating system and editor files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
+Desktop.ini
 *.suo
 *.ntvs*
 *.njsproj
