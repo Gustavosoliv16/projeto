@@ -55,10 +55,10 @@ export function listarPecasPorSolicitacao(req, res) {
     const sql = `
       SELECT sp.ID_SOLICITACAO,
              sp.ID_PECA,
-             ep.NOME_PECA,
+             p.NOME AS NOME_PECA,
              sp.QUANTIDADE_USADA
       FROM SOLICITACAO_PECAS sp
-      JOIN ESTOQUE_PECAS ep ON sp.ID_PECA = ep.ID_PECA
+      JOIN PECAS p ON sp.ID_PECA = p.ID_PECA
       WHERE sp.ID_SOLICITACAO = ?
     `;
 

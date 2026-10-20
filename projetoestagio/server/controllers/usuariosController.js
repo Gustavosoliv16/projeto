@@ -21,12 +21,12 @@ export function listarUsuarios(req, res) {
     if (search) {
       sql += `
         WHERE 
-          NOME_USUARIO CONTAINING ?
+          NOME_USUARIO LIKE ? COLLATE NOCASE
       `;
-      params.push(search, search, search);
+      params.push(`%${search}%`);
     }
     
-    sql += ' ROWS 10';
+    sql += ' LIMIT 10';
 
     conn.query(sql, params, (err2, result) => {
       conn.detach();
@@ -138,7 +138,7 @@ export function cadastrarUsuario(req, res) {
 
 export function atualizarUsuario(req, res) {
   const { id } = req.params;
-  const { NOME_USUARIO, DEPARTAMENTO, CPF, EMAIL, TIPO_USUARIO, SENHA } = req.body;
+  const { NOME_USUARIO, DEPARTAMENTO, CPF, EMAIL, TIPO_USUARIO, SENHA, ID_SETOR } = req.body;
 
   db.get((err, conn) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -149,13 +149,15 @@ export function atualizarUsuario(req, res) {
           CPF = ?, 
           EMAIL = ?, 
           TIPO_USUARIO = ?, 
-          SENHA = ?
+          SENHA = ?,
+          ID_SETOR = ?,
+          DEPARTAMENTO = ?
       WHERE ID_USUARIOS = ?
     `;
 
     conn.query(
       sql,
-      [NOME_USUARIO, DEPARTAMENTO, CPF, EMAIL, TIPO_USUARIO, SENHA, parseInt(id)],
+      [NOME_USUARIO, CPF, EMAIL, TIPO_USUARIO, SENHA, ID_SETOR || null, DEPARTAMENTO || null, parseInt(id)],
       (err2) => {
         conn.detach();
         if (err2) return res.status(500).json({ error: err2.message });

@@ -25,10 +25,10 @@ export function listarUsuariosPaginado(req, res) {
       const sql = `
         SELECT * FROM USUARIOS
         ORDER BY ID_USUARIOS ASC
-        ROWS ? TO ?
+        LIMIT ? OFFSET ?
       `;
 
-      conn.query(sql, [offset + 1, offset + limit], (errData, result) => {
+      conn.query(sql, [limit, offset], (errData, result) => {
         conn.detach();
         if (errData) return res.status(500).json({ error: errData.message });
 
