@@ -1,9 +1,59 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import  {StatusIcon}  from '../components/statusicones.jsx';
+import { StatusIcon } from '../components/statusicones.jsx';
 import "../styles/GerenciarUsuarios.css";
 import "../styles/GerenciarEntidades.css";
+import "../styles/Mode.css";
 
+const EditModal = ({ equipamento, onClose, onSave, setores }) => {
+    const [dadosEditados, setDadosEditados] = useState(equipamento);
+
+    useEffect(() => {
+        setDadosEditados(equipamento);
+    }, [equipamento]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setDadosEditados(prevState => ({ ...prevState, [name]: value }));
+    };
+
+    const handleSave = () => {
+        onSave(dadosEditados);
+    };
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <h2 className="modal-title">Editar Equipamento #{equipamento.ID_PECA}</h2>
+                <div className="form-grid-entidade">
+                    <div>
+                        <label className="form-label">Nome</label>
+                        <input name="NOME" value={dadosEditados.NOME || ''} onChange={handleChange} className="form-input" />
+                    </div>
+                    <div>
+                        <label className="form-label">Modelo</label>
+                        <input name="MODELO" value={dadosEditados.MODELO || ''} onChange={handleChange} className="form-input" />
+                    </div>
+                    <div>
+                        <label className="form-label">Patrimônio</label>
+                        <input name="PATRIMONIO" value={dadosEditados.PATRIMONIO || ''} onChange={handleChange} className="form-input" />
+                    </div>
+                    <div>
+                        <label className="form-label">Setor</label>
+                        <select name="ID_SETOR" value={dadosEditados.ID_SETOR || ''} onChange={handleChange} className="form-input">
+                            <option value="">Selecione o setor</option>
+                            {setores.map(setor => <option key={setor.ID_SETOR} value={setor.ID_SETOR}>{setor.NOME_SETOR}</option>)}
+                        </select>
+                    </div>
+                </div>
+                <div className="modal-actions">
+                    <button onClick={onClose} className="btn-secondary">Cancelar</button>
+                    <button onClick={handleSave} className="btn-primary">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    );
+};
 const GerenciarEquipamentos = () => {
 
     const [nome, setNome] = useState("");
@@ -15,6 +65,9 @@ const GerenciarEquipamentos = () => {
     const [equipamentos, setEquipamentos] = useState([]);
     const [setores, setSetores] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [equipamentoSelecionado, setEquipamentoSelecionado] = useState(null);
 
     
     const fetchData = async () => {
@@ -32,16 +85,28 @@ const GerenciarEquipamentos = () => {
         }
     };
 
-    const handleEdit = async (id, novoNome) => {
+    const handleEditClick = (equipamento) => {
+        setEquipamentoSelecionado(equipamento);
+        setIsEditModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsEditModalOpen(false);
+        setEquipamentoSelecionado(null);
+    };
+
+    const handleSave = async (dadosAtualizados) => {
         try {
-            await axios.put(`/api/setores/${id}`, { NOME_SETOR: novoNome });
+            await axios.put(`/api/pecas/${dadosAtualizados.ID_PECA}`, dadosAtualizados);
+            alert("Equipamento atualizado com sucesso!");
+            handleCloseModal();
             fetchData();
-            alert("Setor atualizado com sucesso!");
         } catch (error) {
-            console.error("Erro ao atualizar setor:", error);
-            alert("Erro ao atualizar setor.");
+            console.error("Erro ao atualizar equipamento:", error);
+            alert("Erro ao atualizar equipamento.");
         }
     };
+
 
     const handleDelete = async (id) => {
         if (window.confirm("Tem certeza que deseja apagar este registro?")) {
@@ -62,24 +127,47 @@ const GerenciarEquipamentos = () => {
     }, []);
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const novoEquipamento = { nome, modelo, numero_serie: NumPatrimonio, id_setor: idSetor, status: "vinte" };
-            await axios.post('/api/pecas', novoEquipamento);
-            
-            setNome("");
-            setModelo("");
-            setNumPatrimonio("");
-            setIdSetor("");
-            fetchData();
-            alert("Equipamento cadastrado com sucesso!");
-        } catch (error) {
-            console.error("Erro ao cadastrar equipamento:", error);
-            alert("Erro ao cadastrar equipamento.");
-        }
-    };
+    e.preventDefault();
+    try {
+    
+        const novoEquipamento = { 
+            NOME: nome,
+            MODELO: modelo,
+            PATRIMONIO: NumPatrimonio, 
+            ID_SETOR: idSetor,             
+
+            DESCRICAO: "", 
+            MARCA: "",     
+            FORNECEDOR: "" 
+        };
+
+        await axios.post('/api/pecas', novoEquipamento);
+        
+        setNome("");
+        setModelo("");
+        setNumPatrimonio("");
+        setIdSetor("");
+        fetchData();
+        alert("Equipamento cadastrado com sucesso!");
+    } catch (error) {
+        console.error("Erro ao cadastrar equipamento:", error);
+        alert("Erro ao cadastrar equipamento.");
+    }
+};
 
     return (
+
+         <>
+            {/* Adicione o Modal ao seu JSX */}
+            {isEditModalOpen && (
+                <EditModal
+                    equipamento={equipamentoSelecionado}
+                    onClose={handleCloseModal}
+                    onSave={handleSave}
+                    setores={setores}
+                />
+            )}
+
         <main className="entidades-container">
             <div className="form-card-entidade">
                 <h2 className="form-title">Cadastrar Novo Equipamento</h2>
@@ -112,48 +200,40 @@ const GerenciarEquipamentos = () => {
                 </form>
             </div>
 
-            <div className="results-card-entidade">
-                <h3 className="results-title">Equipamentos Cadastrados</h3>
-                {loading ? <p>Carregando...</p> : (
-                    <table className="results-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Modelo</th>
-                                <th>Descrição</th>
-                                <th>Secretaria</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {equipamentos.map((eq) => (
-                                <tr key={eq.ID_PECA}>
-                                    <td>{eq.NOME}</td>
-                                    <td>{eq.MODELO}</td>
-                                    <td>{eq.PATRIMONIO}</td>
-                                    <td>{eq.NOME_SETOR || 'N/A'}</td>
-                                    <td><StatusIcon status={eq.STATUS} /></td>
-                                    <td className="actions-cell">
-                                        <div className="actions-grid-container">
-                                           
-                                            <button className="btn-grid btn-visualizar">Visualizar</button>
-                                            <button onClick={() => handleEdit(eq)} className="btn-grid btn-editar">Editar</button>
-                                            
-                                            <button onClick={() => handleEdit(eq)} className="btn-grid btn-detalhes">Ver Detalhes</button>
-                                            <button onClick={() => handleDelete(eq.ID_PECA)} className="btn-grid btn-excluir">Excluir</button>
-                                        </div>
-                                    </td>
+          <div className="results-card-entidade">
+                    <h3 className="results-title">Equipamentos Cadastrados</h3>
+                    {loading ? <p>Carregando...</p> : (
+                        <table className="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Modelo</th>
+                                    <th>Patrimônio</th>
+                                    <th>Setor</th>
+                                    <th>Ações</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
-            </div>
-        </main>
+                            </thead>
+                            <tbody>
+                                {equipamentos.map((eq) => (
+                                    <tr key={eq.ID_PECA}>
+                                        <td>{eq.NOME}</td>
+                                        <td>{eq.MODELO}</td>
+                                        <td>{eq.PATRIMONIO}</td>
+                                        <td>{eq.NOME_SETOR || 'N/A'}</td>
+                                        <td className="actions-cell">
+                                            <button className="btn-grid btn-detalhes"> detalhes</button>
+                                            <button onClick={() => handleEditClick(eq)} className="btn-grid btn-editar btn-">Editar</button>
+                                            <button onClick={() => handleDelete(eq.ID_PECA)} className="btn-grid btn-excluir">Excluir</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            </main>
+        </>
     );
 }
 
 export default GerenciarEquipamentos;
-
- 

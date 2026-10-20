@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; // 1. Importar o useEffect
+import { useState, useEffect } from "react"; 
 import axios from "axios";
 
 const CadastroUsuario = () => {

@@ -222,7 +222,7 @@ const GerenciarOrdensServico = () => {
                                                 </td>
                                                 <td>{formatarData(os.DATA_CRIACAO)}</td>
                                                 <td>
-                                                    <button onClick={() => handleDetalhesClick(os)} className="btn-secondary">Detalhes</button>
+                                                    <button onClick={() => handleDetalhesClick(os)} className="btn-visualizar btn-primary" ><strong> Detalhes </strong></button>
                                                 </td>
                                             </tr>
                                         ))

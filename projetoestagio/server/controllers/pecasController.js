@@ -112,7 +112,7 @@ export function listarPecasPorId(req, res) {
 
 export function atualizarPeca(req, res) {
   const { id } = req.params;
-  const { NOME, DESCRICAO, MODELO, MARCA, FORNECEDOR, PATRIMONIO } = req.body;
+  const { NOME, DESCRICAO, MODELO, MARCA, FORNECEDOR, PATRIMONIO, ID_SETOR } = req.body;
 
   db.get((err, conn) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -124,20 +124,31 @@ export function atualizarPeca(req, res) {
           MODELO = ?,
           MARCA = ?,
           FORNECEDOR = ?,
-          PATRIMONIO = ?
+          PATRIMONIO = ?,
+          ID_SETOR = ?
       WHERE ID_PECA = ?
     `;
 
-    conn.query(
-      sql,
-      [NOME, DESCRICAO, MODELO, MARCA, FORNECEDOR, PATRIMONIO, parseInt(id)],
-      (err2) => {
+    const params = [
+        NOME || null, 
+        DESCRICAO || null, 
+        MODELO || null, 
+        MARCA || null, 
+        FORNECEDOR || null, 
+        PATRIMONIO || null, 
+        ID_SETOR || null, 
+        parseInt(id)
+    ];
+
+    conn.query(sql, params, (err2) => {
         conn.detach();
-        if (err2) return res.status(500).json({ error: err2.message });
+        if (err2) {
+            console.error("Erro ao atualizar peça:", err2); // Bom para depuração
+            return res.status(500).json({ error: err2.message });
+        }
 
         res.status(200).json({
-          message: "Peça atualizada com sucesso",
-          peca: { ID: id, NOME, DESCRICAO, MODELO, MARCA, FORNECEDOR, PATRIMONIO }
+          message: "Peça atualizada com sucesso"
         });
       }
     );

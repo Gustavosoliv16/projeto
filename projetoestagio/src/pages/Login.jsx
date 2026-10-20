@@ -55,6 +55,9 @@ const handleLogin = async (e) => {
       />
       
       <button id="botao" type="submit">Entrar</button>
+      {import.meta.env.DEV && (
+        <p>Teste local: teste@local.test / teste123</p>
+      )}
     </form >
   );
 }
